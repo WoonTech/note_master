@@ -6,43 +6,42 @@ import 'package:sqflite/sqflite.dart';
 
 const String dbName = 'note_master_db.db';
 
-
-Future<bool> dbExists() async{
+Future<bool> dbExists() async {
   final directory = await getApplicationDocumentsDirectory();
   final path = join(directory.path, dbName);
   return File(path).existsSync();
 }
 
-Future postDBs() async{
+Future ensureDBExisted() async {
   bool isDBExisted = await dbExists();
-  if (!isDBExisted){
+  if (!isDBExisted) {
     await postDBAsync();
   }
 }
 
-Future postDBAsync() async{
+Future postDBAsync() async {
   //Create Note Header
   String createNoteHeaderQuery = getCreateNoteHeaderQuery();
   String createNoteDetailQuery = getCreateNoteDetailQuery();
   String createCategoryQuery = getCreateCategoryQuery();
+  String createNoteReminderQuery = getCreateNoteReminderQuery();
   //String createNoteCategoryQuery = getCreateNoteCategoryQuery();
   Database db = await openDatabase(dbName);
   await db.transaction((txn) async {
     await txn.execute(createNoteHeaderQuery);
     await txn.execute(createNoteDetailQuery);
     await txn.execute(createCategoryQuery);
+    await txn.execute(createNoteReminderQuery);
     //await txn.execute(createNoteCategoryQuery);
-
   });
 }
 
-String getCreateNoteHeaderQuery(){
+String getCreateNoteHeaderQuery() {
   return '''
   CREATE TABLE NoteHeader (
-    ID INTEGER PRIMARY KEY,
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
     CreatedAt TEXT,
     UpdatedAt TEXT,
-    RemindedAt TEXT,
     Title TEXT,
     IsPinned TEXT,
     Status TEXT,
@@ -51,7 +50,7 @@ String getCreateNoteHeaderQuery(){
 ''';
 }
 
-String getCreateNoteDetailQuery(){
+String getCreateNoteDetailQuery() {
   return '''
   CREATE TABLE NoteHeader (
     ID INTEGER PRIMARY KEY,
@@ -63,15 +62,29 @@ String getCreateNoteDetailQuery(){
 ''';
 }
 
-String getCreateCategoryQuery(){
+String getCreateCategoryQuery() {
   return '''
     CREATE TABLE Category (
-      ID INTEGER PRIMARY KEY,
+      ID INTEGER PRIMARY KEY AUTOINCREMENT,
+      NoteID TEXT,
       CreatedAt TEXT,
       UpdatedAt TEXT,
       CategoryName TEXT,
       Status TEXT,
       Type TEXT,
+    )
+  ''';
+}
+
+String getCreateNoteReminderQuery() {
+  return '''
+    CREATE TABLE Category (
+      ID INTEGER PRIMARY KEY AUTOINCREMENT,
+      CreatedAt TEXT,
+      UpdatedAt TEXT,
+      ReminderAt TEXT,
+      Repetition TEXT,
+      NotificationText TEXT,
     )
   ''';
 }
