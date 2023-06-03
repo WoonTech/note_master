@@ -1,16 +1,40 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../utils/data_access.dart';
 import '../models/category.dart';
 
 Future postCategoryAsync(NMCategory category) async {
-  
+  var db = await initialiseDBAsync();
+  try {
+    return await db.transaction((txn) async {
+      await txn.insert('Category', {
+        'CreatedAt': category.createdAt.toIso8601String(),
+        'UpdatedAt': category.updatedAt.toIso8601String(),
+        'CategoryName': category.name.trim(),
+        'Status': category.status,
+        'Type': category.type,
+      });
+    });
+  } catch (e) {
+    throw Exception(e);
+  } finally {
+    db.close();
+  }
 }
 
+/*List<NMCategory> getCategories(){
+  List<NMCategory> categories = <NMCategory>[];
+  getCategoriesAsync().then((value) {
+    categories = value;
+  });
+  return categories;
+}*/
+
 Future<List<NMCategory>> getCategoriesAsync() async{
-  String getCategoriesQuery = 'Select * from NoteHeader'; 
-  var db = await openDatabase(dbName);
+  String getCategoriesQuery = 'Select * from Category'; 
+  var db = await initialiseDBAsync();
   var results = await db.rawQuery(getCategoriesQuery);
   try
   {
@@ -25,10 +49,10 @@ Future<List<NMCategory>> getCategoriesAsync() async{
 
 Future patchCategoryAsync(NMCategory category) async{
   DateTime updatedAt = DateTime.now();
-  var db = await openDatabase(dbName);
+  var db = await initialiseDBAsync();;
   try{
     await db.transaction((txn) async{
-      await db.update('Category', {
+      await txn.update('Category', {
         'UpdatedAt':updatedAt.toIso8601String(),
         'CategoryName':category.name.trim(),
         'Status': category.status,
@@ -47,7 +71,7 @@ Future patchCategoryAsync(NMCategory category) async{
 
 Future deleteCategoryAsync(NMCategory category) async{
   DateTime updatedAt = DateTime.now();
-  var db = await openDatabase(dbName);
+  var db = await initialiseDBAsync();
   try{
 
     await db.transaction((txn) async{

@@ -5,35 +5,39 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 const String dbName = 'note_master_db.db';
-
-Future<bool> dbExists() async {
-  final directory = await getApplicationDocumentsDirectory();
-  final path = join(directory.path, dbName);
+Future<bool> dbExists(String path) async {
   return File(path).existsSync();
 }
 
 Future ensureDBExisted() async {
-  bool isDBExisted = await dbExists();
+  final directory = await getDatabasesPath();
+  String path = join(directory, dbName);
+  bool isDBExisted = await dbExists(path);
   if (!isDBExisted) {
-    await postDBAsync();
+    await initialiseDBAsync();
   }
 }
 
-Future postDBAsync() async {
+Future<Database> initialiseDBAsync() async{
   //Create Note Header
+  final directory = await getDatabasesPath();
+  String path = join(directory, dbName);
   String createNoteHeaderQuery = getCreateNoteHeaderQuery();
   String createNoteDetailQuery = getCreateNoteDetailQuery();
   String createCategoryQuery = getCreateCategoryQuery();
   String createNoteReminderQuery = getCreateNoteReminderQuery();
-  //String createNoteCategoryQuery = getCreateNoteCategoryQuery();
-  Database db = await openDatabase(dbName);
-  await db.transaction((txn) async {
-    await txn.execute(createNoteHeaderQuery);
-    await txn.execute(createNoteDetailQuery);
-    await txn.execute(createCategoryQuery);
-    await txn.execute(createNoteReminderQuery);
-    //await txn.execute(createNoteCategoryQuery);
-  });
+  return await openDatabase(
+    path,
+    version: 1,
+    onCreate: (db, version) async {
+      return await db.transaction((txn) async {
+        await txn.execute(createNoteHeaderQuery);
+        await txn.execute(createNoteDetailQuery);
+        await txn.execute(createCategoryQuery);
+        await txn.execute(createNoteReminderQuery);
+      });
+    },
+  );
 }
 
 String getCreateNoteHeaderQuery() {
@@ -45,21 +49,21 @@ String getCreateNoteHeaderQuery() {
     Title TEXT,
     IsPinned TEXT,
     Status TEXT,
-    CategoryID TEXT,
+    CategoryID TEXT
   )
-''';
+  ''';
 }
 
 String getCreateNoteDetailQuery() {
   return '''
-  CREATE TABLE NoteHeader (
+  CREATE TABLE NoteDetail (
     ID INTEGER PRIMARY KEY,
     NoteID TEXT,
     CreatedAt TEXT,
     UpdatedAt TEXT,
-    Content TEXT,
+    Content TEXT
   )
-''';
+  ''';
 }
 
 String getCreateCategoryQuery() {
@@ -71,20 +75,20 @@ String getCreateCategoryQuery() {
       UpdatedAt TEXT,
       CategoryName TEXT,
       Status TEXT,
-      Type TEXT,
+      Type TEXT
     )
-  ''';
+    ''';
 }
 
 String getCreateNoteReminderQuery() {
   return '''
-    CREATE TABLE Category (
+    CREATE TABLE NoteReminder (
       ID INTEGER PRIMARY KEY AUTOINCREMENT,
       CreatedAt TEXT,
       UpdatedAt TEXT,
       ReminderAt TEXT,
       Repetition TEXT,
-      NotificationText TEXT,
+      NotificationText TEXT
     )
   ''';
 }

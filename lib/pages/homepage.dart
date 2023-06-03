@@ -1,60 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:note_master/services/category_access.dart';
 import 'package:provider/provider.dart';
 
-import '../common_widgets/reminder.dart';
+import '../components/card.dart';
 import '../models/category.dart';
+import '../models/note_header.dart';
 import '../models/styling.dart';
+import '../services/note_access.dart';
+import '../utils/data_access.dart';
+import 'note_page.dart';
 
 int _current = 0;
 String _selectText = 'reminder: 5 days';
-List<NMCategory> categories = [
-  NMCategory(
-      createdAt: DateTime.now(), updatedAt: DateTime.now(), name: 'Add sdaNew'),
-  NMCategory(
-      createdAt: DateTime.now(), updatedAt: DateTime.now(), name: 'Add New'),
-  NMCategory(
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-      name: 'asdasdasdasdasdsda'),
-  NMCategory(
-      createdAt: DateTime.now(), updatedAt: DateTime.now(), name: 'Add New'),
-];
 
 List<String> dropdownList = ['Notes', 'reminder: 10 days', 'reminder: 20 days'];
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => CurrentTheme(),
-      child: const MaterialApp(
-        home: HomePage(),
-      ),
-    );
-  }
-}
-
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  List<NMCategory> categories = [];
   @override
   void initState() {
     super.initState();
-    //categories = getCategoriesAsync() as List<NMCategory>;
+    GetCategories();
     //Provider.of<CurrentTheme>(context, listen: false).setThemeStyle(0);
     _current = 0;
+  }
+
+  Future<void> GetCategories() async {
+    List<NMCategory> data = (await getCategoriesAsync())
+      .where((c) => c.type == note_type)
+      .toList(); 
+    setState(() {
+      categories = data;
+    });
   }
 
   @override
@@ -71,17 +54,17 @@ class _HomePageState extends State<HomePage> {
                     Container(
                       color: currentTheme.theme.Theme_Color_SUBDOMAIN,
                     ),
-                    BodyWidget(currentTheme: currentTheme),
+                    BodyWidget(currentTheme: currentTheme, categories: categories),
                     const SearchBarWidget()
                   ],
                 )),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          /*Navigator.push(
+          Navigator.push(
             context, 
-            MaterialPageRoute(builder: (context)=> NoteWidget())
-          );*/
+            MaterialPageRoute(builder: (context)=> const NotePage())
+          );
         },
         backgroundColor: Colors.black,
         child: const Icon(
@@ -96,7 +79,8 @@ class _HomePageState extends State<HomePage> {
 
 class BodyWidget extends StatefulWidget {
   final CurrentTheme currentTheme;
-  const BodyWidget({required this.currentTheme, super.key});
+  final List<NMCategory> categories;
+  const BodyWidget({required this.currentTheme,required this.categories, super.key});
 
   @override
   State<BodyWidget> createState() => _BodyWidgetState();
@@ -104,6 +88,22 @@ class BodyWidget extends StatefulWidget {
 
 class _BodyWidgetState extends State<BodyWidget> {
   double _contentHeight = Expansion_Height_UNTAP;
+  List<NoteHeader> note = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchNote();
+    //Provider.of<CurrentTheme>(context, listen: false).setThemeStyle(0);
+    _current = 0;
+  }
+  
+  Future<void> fetchNote() async {
+    List<NoteHeader> data = await getNotesAsync();
+    setState(() {
+      note = data;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Positioned.fill(
@@ -171,7 +171,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                         child: ListView.builder(
                             physics: const BouncingScrollPhysics(),
                             scrollDirection: Axis.horizontal,
-                            itemCount: categories.length,
+                            itemCount: widget.categories.length,
                             itemBuilder: (context, index) {
                               return GestureDetector(
                                 onTap: () {
@@ -201,7 +201,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                                   child: Padding(
                                     padding: const EdgeInsets.only(
                                         left: 12, right: 10, top: 6, bottom: 6),
-                                    child: Text(categories[index].name,
+                                    child: Text(widget.categories[index].name,
                                         textAlign: TextAlign.justify,
                                         style: TextStyle(
                                             color: _current == index
@@ -221,7 +221,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                           child: ListView.builder(
                               physics: const BouncingScrollPhysics(),
                               scrollDirection: Axis.vertical,
-                              itemCount: 5,
+                              itemCount: note.length,
                               itemBuilder: (context, index) {
                                 return GestureDetector(
                                     onTap: () {
@@ -232,7 +232,8 @@ class _BodyWidgetState extends State<BodyWidget> {
                                             : Expansion_Height_UNTAP;
                                       });
                                     },
-                                    child: ContentWidget(
+                                    child: CardWidget(
+                                      note: note[index],
                                       currentTheme: widget.currentTheme,
                                       contentHeight: _contentHeight,
                                     ));
@@ -324,98 +325,6 @@ class SearchBarWidget extends StatelessWidget {
             ],
           ),
         ));
-  }
-}
-
-class ContentWidget extends StatefulWidget {
-  final CurrentTheme currentTheme;
-  final double contentHeight;
-  const ContentWidget(
-      {required this.currentTheme, required this.contentHeight, super.key});
-
-  @override
-  State<ContentWidget> createState() => _ContentWidgetState();
-}
-
-class _ContentWidgetState extends State<ContentWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        elevation: 2,
-        child: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Container(
-                decoration: BoxDecoration(
-                    border: Border(
-                        left: BorderSide(
-                            color: widget.currentTheme.theme.Theme_Color_ROOT,
-                            width: 7))),
-                child: Column(
-                  children: <Widget>[
-                    ListTileTheme(
-                      contentPadding: const EdgeInsets.only(left: 10),
-                      dense: true,
-                      horizontalTitleGap: 0.0,
-                      minLeadingWidth: 0,
-                      child: ExpansionTile(
-                        backgroundColor: Colors.transparent,
-                        shape: const RoundedRectangleBorder(
-                            side: BorderSide(color: Colors.transparent)),
-                        title: Text(
-                          'hello',
-                          style: TextStyle(
-                            fontFamily: Font_Family_LATO,
-                            fontSize: Font_Size_HEADER,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black,
-                          ),
-                        ),
-
-                        trailing: IconButton(
-                            onPressed: () {},
-                            icon: Icon(
-                              Icons.star_border,
-                              size: 20,
-                              color: Font_Color_UNSELECTED,
-                            )),
-                        //inkwellFactory: NoSplashFactory(),
-                        children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 10.0),
-                            child: Expanded(
-                                child: Text(
-                              'dio jskdj ksdjks jdk sjkdjskd jskjd skjd ksj ksjd ksjdk sjdk jskd jskd jskd jskdj',
-                              style: TextStyle(
-                                  color: Font_Color_Default,
-                                  fontSize: Font_Size_CONTENT,
-                                  fontFamily: Font_Family_LATO,
-                                  fontWeight: FontWeight.w500),
-                            )),
-                          )
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(left: 10, right: 10, bottom: 5),
-                      child: Row(children: [
-                        Text(
-                          '20.10.2023 13:25:32',
-                          style: TextStyle(
-                              color: Font_Color_SUBDOMAIN,
-                              fontSize: Font_Size_CONTENT,
-                              fontFamily: Font_Family_LATO),
-                        ),
-                        const Expanded(child: SizedBox()),
-                        NotificationWidget(),
-                      ]),
-                    )
-                  ],
-                ))));
   }
 }
 

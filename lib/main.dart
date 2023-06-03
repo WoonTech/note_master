@@ -1,36 +1,21 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:note_master/pages/checklist_page.dart';
 import 'package:note_master/pages/homepage.dart';
 import 'package:note_master/models/category.dart';
-import 'package:note_master/pages/note_page.dart';
-import 'package:note_master/pages/notepad.dart';
+import 'package:note_master/services/category_access.dart';
 import 'package:note_master/utils/data_access.dart';
 import 'package:provider/provider.dart';
-
+import 'constants/status.dart';
 import 'models/styling.dart';
 
 int _current = 0;
 String _selectText = 'reminder: 5 days';
-List<NMCategory> categories = [
-  NMCategory(
-      createdAt: DateTime.now(), updatedAt: DateTime.now(), name: 'Add sdaNew'),
-  NMCategory(
-      createdAt: DateTime.now(), updatedAt: DateTime.now(), name: 'Add New'),
-  NMCategory(
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-      name: 'asdasdasdasdasdsda'),
-  NMCategory(
-      createdAt: DateTime.now(), updatedAt: DateTime.now(), name: 'Add New'),
-];
 
 List<String> dropdownList = ['Notes', 'reminder: 10 days', 'reminder: 20 days'];
 
 void main() {
-  /*runApp(MaterialApp(
-    home: HomePage()
-  ));*/
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -45,75 +30,51 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    updateThemeFromSharedPref();
-    dbExists().then((value) => null);
+    ensureDBExisted().whenComplete(() async {
+      await initialize();
+    });
+    //ensureDBExisted().then((value) => initialize());
+    //updateThemeFromSharedPref();
+
   }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => CurrentTheme(),
-      child: MaterialApp(
+      child: const MaterialApp(
         home: SwipeNavigation(),
       ),
     );
   }
 
   void updateThemeFromSharedPref() async {}
-}
-
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  @override
-  void initState() {
-    super.initState();
-    //categories = getCategoriesAsync() as List<NMCategory>;
-    //Provider.of<CurrentTheme>(context, listen: false).setThemeStyle(0);
-    _current = 0;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).requestFocus(FocusNode());
-        },
-        child: Consumer<CurrentTheme>(
-            builder: (context, currentTheme, child) => Stack(
-                  children: [
-                    Container(
-                      color: currentTheme.theme.Theme_Color_SUBDOMAIN,
-                    ),
-                    BodyWidget(currentTheme: currentTheme),
-                    const SearchBarWidget()
-                  ],
-                )),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => NotePage()));
-        },
-        backgroundColor: Colors.black,
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-          size: 30,
-        ),
-      ),
-    );
+  Future initialize() async {
+    //if category is empty, create all
+    var categories = await getCategoriesAsync();
+    if(categories.isEmpty){
+      var currentTime = DateTime.now();
+      var nmNoteCategory = NMCategory(
+        createdAt: currentTime, 
+        updatedAt: currentTime,
+        name: category_default, 
+        status: activeStatus,
+        type: note_type);
+      var nmChecklistCategory = NMCategory(
+        createdAt: currentTime, 
+        updatedAt: currentTime,
+        name: category_default, 
+        status: activeStatus,
+        type: checklist_type);
+      await postCategoryAsync(nmNoteCategory);
+      await postCategoryAsync(nmChecklistCategory);
+    }
   }
 }
 
 class SwipeNavigation extends StatefulWidget {
+  const SwipeNavigation({super.key});
+
   @override
   _SwipeNavigationState createState() => _SwipeNavigationState();
 }
@@ -141,7 +102,7 @@ class _SwipeNavigationState extends State<SwipeNavigation> {
       });
       _pageController.animateToPage(
         _currentPageIndex,
-        duration: Duration(milliseconds: 300),
+        duration: Duration(milliseconds: 100),
         curve: Curves.easeInOut,
       );
     }
@@ -154,7 +115,7 @@ class _SwipeNavigationState extends State<SwipeNavigation> {
       });
       _pageController.animateToPage(
         _currentPageIndex,
-        duration: Duration(milliseconds: 300),
+        duration: Duration(milliseconds: 100),
         curve: Curves.easeInOut,
       );
     }

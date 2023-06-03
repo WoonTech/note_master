@@ -4,23 +4,23 @@ import 'note_detail.dart';
 
 class NoteHeader {
   int? id;
-  DateTime? createdAt;
-  DateTime? updatedAt;
-  String? title;
+  DateTime createdAt;
+  DateTime updatedAt;
+  String title;
   bool isPinned = false;
   String status;
-  String? category;
+  String category;
   NoteDetail? noteDetail;
   NoteReminder? noteReminder;
 
   NoteHeader(
       {this.id,
-      this.createdAt,
-      this.updatedAt,
-      this.title,
+      required this.createdAt,
+      required this.updatedAt,
+      required this.title,
       this.isPinned = false,
       this.status = activeStatus,
-      this.category});
+      required this.category});
 
   factory NoteHeader.fromJson(Map<String, dynamic> json) {
     return NoteHeader(

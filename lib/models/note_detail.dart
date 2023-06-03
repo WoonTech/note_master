@@ -1,12 +1,12 @@
 class NoteDetail {
   int? id;
   int? noteId;
-  DateTime? createdAt = DateTime.now();
-  DateTime? updatedAt = DateTime.now();
-  String? content;
+  DateTime createdAt = DateTime.now();
+  DateTime updatedAt = DateTime.now();
+  String content;
 
   NoteDetail(
-      {this.id, this.noteId, this.createdAt, this.updatedAt, this.content});
+      {this.id, this.noteId, required this.createdAt, required this.updatedAt, required this.content});
 
   factory NoteDetail.fromJson(Map<String, dynamic> json) {
     return NoteDetail(

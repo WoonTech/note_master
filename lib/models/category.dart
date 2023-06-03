@@ -1,5 +1,9 @@
 import 'package:note_master/constants/status.dart';
 
+const String category_default = 'All';
+const String note_type = 'note';
+const String checklist_type = 'checklist';
+
 class NMCategory{
   int? id;
   DateTime createdAt;
@@ -8,14 +12,14 @@ class NMCategory{
   String? status = activeStatus;
   String? type = "";
 
-  NMCategory({this.id, required this.createdAt, required this.updatedAt, required this.name, this.status, this.type});
+  NMCategory({this.id, required this.createdAt, required this.updatedAt, required this.name, required this.status, required this.type});
 
   factory NMCategory.fromJson(Map<String, dynamic> json) {
     return NMCategory(
       id: json['ID'],
-      createdAt: json['CreatedAt'],
-      updatedAt: json['UpdatedAt'],
-      name: json['Name'],
+      createdAt: DateTime.parse(json['CreatedAt']),
+      updatedAt: DateTime.parse(json['UpdatedAt']),
+      name: json['CategoryName'],
       status: json['Status'],
       type: json['Type']
     );
