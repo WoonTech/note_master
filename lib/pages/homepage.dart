@@ -4,11 +4,12 @@ import 'package:provider/provider.dart';
 
 import '../components/card.dart';
 import '../models/category.dart';
-import '../models/note_header.dart';
+import '../models/layout.dart';
+import '../models/noteheader.dart';
 import '../models/styling.dart';
 import '../services/note_access.dart';
 import '../utils/data_access.dart';
-import 'note_page.dart';
+import 'notepage.dart';
 
 int _current = 0;
 String _selectText = 'reminder: 5 days';
@@ -22,7 +23,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<NMCategory> categories = [];
+  //List<NMCategory> categories = [];
   @override
   void initState() {
     super.initState();
@@ -48,7 +49,7 @@ class _HomePageState extends State<HomePage> {
         onTap: () {
           FocusScope.of(context).requestFocus(FocusNode());
         },
-        child: Consumer<CurrentTheme>(
+        child: Consumer<LayoutDataProvider>(
             builder: (context, currentTheme, child) => Stack(
                   children: [
                     Container(
@@ -78,7 +79,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 class BodyWidget extends StatefulWidget {
-  final CurrentTheme currentTheme;
+  final LayoutDataProvider currentTheme;
   final List<NMCategory> categories;
   const BodyWidget({required this.currentTheme,required this.categories, super.key});
 
@@ -88,22 +89,22 @@ class BodyWidget extends StatefulWidget {
 
 class _BodyWidgetState extends State<BodyWidget> {
   double _contentHeight = Expansion_Height_UNTAP;
-  List<NoteHeader> note = [];
+  //List<NoteHeader> note = [];
 
   @override
   void initState() {
     super.initState();
-    fetchNote();
-    //Provider.of<CurrentTheme>(context, listen: false).setThemeStyle(0);
+    getNotes();
     _current = 0;
   }
   
-  Future<void> fetchNote() async {
+  Future<void> getNotes() async {
     List<NoteHeader> data = await getNotesAsync();
     setState(() {
-      note = data;
+      notes = data;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Positioned.fill(
@@ -177,7 +178,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                                 onTap: () {
                                   setState(() {
                                     _current = index;
-                                    Provider.of<CurrentTheme>(context,
+                                    Provider.of<LayoutDataProvider>(context,
                                             listen: false)
                                         .setThemeStyle(index);
                                   });
@@ -221,7 +222,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                           child: ListView.builder(
                               physics: const BouncingScrollPhysics(),
                               scrollDirection: Axis.vertical,
-                              itemCount: note.length,
+                              itemCount: notes.length,
                               itemBuilder: (context, index) {
                                 return GestureDetector(
                                     onTap: () {
@@ -233,7 +234,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                                       });
                                     },
                                     child: CardWidget(
-                                      note: note[index],
+                                      note: notes[index],
                                       currentTheme: widget.currentTheme,
                                       contentHeight: _contentHeight,
                                     ));

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:note_master/models/category.dart';
-import 'package:note_master/models/note_detail.dart';
-import 'package:note_master/models/note_header.dart';
-import 'package:note_master/models/note_reminder.dart';
+import 'package:note_master/models/layout.dart';
+import 'package:note_master/models/notedetail.dart';
+import 'package:note_master/models/noteheader.dart';
+import 'package:note_master/models/notereminder.dart';
 import 'package:note_master/models/styling.dart';
 import 'package:note_master/services/note_access.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../components/reminder.dart';
 import '../constants/status.dart';
 
@@ -22,6 +24,9 @@ class _NotePageState extends State<NotePage> {
   DateTime createdAt = DateTime.now();
   late String contentTitle;
   late DateTime updatedAt;
+  DateTime? reminderAt;
+  int repetition = 0;
+  String notificationText = '';
   late bool isPinned;
   late String status;
   String categoryId = category_default;
@@ -52,6 +57,30 @@ class _NotePageState extends State<NotePage> {
     return '';
   }
 
+  NoteHeader ToNote(){
+    var noteHeader = NoteHeader(
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      title: titleTextEditingController.text,
+      isPinned: isNotePinned,
+      status: activeStatus,
+      category: categoryId
+    );
+    var noteDetail = NoteDetail(
+        content: contentTextEditingController.text);
+    if(reminderAt != null){
+      var noteReminder = NoteReminder(
+        createdAt: createdAt, 
+        updatedAt: updatedAt, 
+        remindedAt: reminderAt ?? DateTime.now(), 
+        repetition: repetition, 
+        notificationText: notificationText);
+      noteHeader.noteReminder = noteReminder;
+    }
+    noteHeader.noteDetail = noteDetail;
+    return noteHeader;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,6 +91,7 @@ class _NotePageState extends State<NotePage> {
           margin: const EdgeInsets.only(left: 20),
           child: IconButton(
               onPressed: () {
+                FocusScope.of(context).requestFocus(FocusNode());
                 Navigator.pop(context);
               },
               icon: Icon(
@@ -123,20 +153,11 @@ class _NotePageState extends State<NotePage> {
                     titleTextEditingController.text =
                         updateTitle(contentTextEditingController.text);
                   }
-                  var noteHeader = NoteHeader(
-                    createdAt: createdAt,
-                    updatedAt: updatedAt,
-                    title: titleTextEditingController.text,
-                    isPinned: isNotePinned,
-                    status: activeStatus,
-                    category: categoryId
-                  );
-                  var noteDetail = NoteDetail(
-                      createdAt: createdAt,
-                      updatedAt: updatedAt,
-                      content: contentTextEditingController.text);
-                  noteHeader.noteDetail = noteDetail;
+                  var noteHeader = ToNote();
                   saveNoteAsync(noteHeader);
+                    setState(() {
+                      Provider.of<LayoutDataProvider>(context,listen: false).addLatestNoteToList(noteHeader);
+                    });
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
                 icon: Icon(

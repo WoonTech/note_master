@@ -1,12 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:note_master/pages/checklist_page.dart';
+import 'package:note_master/pages/checklistpage.dart';
 import 'package:note_master/pages/homepage.dart';
 import 'package:note_master/models/category.dart';
 import 'package:note_master/services/category_access.dart';
 import 'package:note_master/utils/data_access.dart';
 import 'package:provider/provider.dart';
 import 'constants/status.dart';
+import 'models/layout.dart';
 import 'models/styling.dart';
 
 int _current = 0;
@@ -30,7 +31,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    ensureDBExisted().whenComplete(() async {
+    SQLDataAccess().initialiseDBAsync().whenComplete(() async {
       await initialize();
     });
     //ensureDBExisted().then((value) => initialize());
@@ -41,7 +42,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => CurrentTheme(),
+      create: (context) => LayoutDataProvider(),
       child: const MaterialApp(
         home: SwipeNavigation(),
       ),

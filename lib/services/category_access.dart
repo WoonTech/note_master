@@ -6,7 +6,7 @@ import '../utils/data_access.dart';
 import '../models/category.dart';
 
 Future postCategoryAsync(NMCategory category) async {
-  var db = await initialiseDBAsync();
+  var db = (await database);
   try {
     return await db.transaction((txn) async {
       await txn.insert('Category', {
@@ -19,8 +19,6 @@ Future postCategoryAsync(NMCategory category) async {
     });
   } catch (e) {
     throw Exception(e);
-  } finally {
-    db.close();
   }
 }
 
@@ -34,7 +32,7 @@ Future postCategoryAsync(NMCategory category) async {
 
 Future<List<NMCategory>> getCategoriesAsync() async{
   String getCategoriesQuery = 'Select * from Category'; 
-  var db = await initialiseDBAsync();
+  var db = (await database);
   var results = await db.rawQuery(getCategoriesQuery);
   try
   {
@@ -42,14 +40,14 @@ Future<List<NMCategory>> getCategoriesAsync() async{
     {
       return NMCategory.fromJson(results[index]);
     });
-  } finally {
-    db.close();
+  } catch(ex) {
+    throw Exception(ex);
   }
 }
 
 Future patchCategoryAsync(NMCategory category) async{
   DateTime updatedAt = DateTime.now();
-  var db = await initialiseDBAsync();;
+  var db = (await database);
   try{
     await db.transaction((txn) async{
       await txn.update('Category', {
@@ -64,14 +62,12 @@ Future patchCategoryAsync(NMCategory category) async{
       });
   }catch (e) {
     throw Exception(e);
-  } finally {
-    db.close();
   }
 }
 
 Future deleteCategoryAsync(NMCategory category) async{
   DateTime updatedAt = DateTime.now();
-  var db = await initialiseDBAsync();
+  var db = (await database);
   try{
 
     await db.transaction((txn) async{
@@ -90,11 +86,6 @@ Future deleteCategoryAsync(NMCategory category) async{
       });
 
   }catch (e) {
-
     throw Exception(e);
-
-  } finally {
-
-    db.close();
   }
 }

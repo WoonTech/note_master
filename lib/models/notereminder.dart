@@ -1,18 +1,17 @@
 import 'package:note_master/constants/status.dart';
-import 'note_detail.dart';
 
 class NoteReminder {
   int? id;
-  int noteId;
+  int? noteId;
   DateTime createdAt;
   DateTime updatedAt;
   DateTime remindedAt;
-  String repetition;
+  int repetition;
   String notificationText;
 
   NoteReminder(
       {this.id,
-      required this.noteId,
+      this.noteId,
       required this.createdAt,
       required this.updatedAt,
       required this.remindedAt,
@@ -23,9 +22,9 @@ class NoteReminder {
     return NoteReminder(
         id: json['ID'],
         noteId: json['NoteID'],
-        createdAt: json['CreatedAt'],
-        updatedAt: json['UpdatedAt'],
-        remindedAt: json['RemindedAt'],
+        createdAt: DateTime.parse(json['CreatedAt']),
+        updatedAt: DateTime.parse(json['UpdatedAt']),
+        remindedAt: DateTime.parse(json['RemindedAt']),
         repetition: json['Repetition'],
         notificationText: json['NotificationText']);
   }

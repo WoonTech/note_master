@@ -1,9 +1,9 @@
-import 'package:note_master/models/note_reminder.dart';
+import 'package:note_master/models/notereminder.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../models/category.dart';
-import '../models/note_detail.dart';
-import '../models/note_header.dart';
+import '../models/notedetail.dart';
+import '../models/noteheader.dart';
 import '../utils/data_access.dart';
 
 Future saveNoteAsync(NoteHeader noteHeader) async {
@@ -16,22 +16,25 @@ Future saveNoteAsync(NoteHeader noteHeader) async {
 }
 
 Future postNoteAsync(NoteHeader noteHeader) async {
-  var noteId = await postNoteHeaderAsync(noteHeader);
-  if(noteId == null || noteId != 0){
-    await postNoteDetailAsync(noteId!, noteHeader.noteDetail!);
-    await postNoteReminderAsync(noteId!, noteHeader.noteReminder!);
+  await postNoteHeaderAsync(noteHeader);
+  var latestNoteId = await getLastUpdatedNoteIdAsync() ?? 0;
+  if(latestNoteId != 0){
+    await postNoteDetailAsync(latestNoteId, noteHeader.noteDetail!);
+    if(noteHeader.noteReminder != null){
+      await postNoteReminderAsync(latestNoteId, noteHeader.noteReminder!);
+    }
   }
 
 }
 
 Future<int?> postNoteHeaderAsync(NoteHeader noteHeader) async {
-  var db = await initialiseDBAsync();
+  var db = (await database);
   try {
     await db.transaction((txn) async {
-      return await txn.insert('NoteHeader', {
-        'CreatedAt': noteHeader.createdAt?.toIso8601String(),
-        'UpdatedAt': noteHeader.updatedAt?.toIso8601String(),
-        'Title': noteHeader.title?.trim(),
+      await txn.insert('NoteHeader', {
+        'CreatedAt': noteHeader.createdAt.toIso8601String(),
+        'UpdatedAt': noteHeader.updatedAt.toIso8601String(),
+        'Title': noteHeader.title.trim(),
         'IsPinned': noteHeader.isPinned.toString(),
         'Status': noteHeader.status,
         'CategoryID': noteHeader.category
@@ -39,31 +42,26 @@ Future<int?> postNoteHeaderAsync(NoteHeader noteHeader) async {
     });
   } catch (e) {
     throw Exception(e);
-  } finally {
-    db.close();
   }
 }
 
 Future postNoteDetailAsync(int noteId, NoteDetail noteDetail) async {
-  var db = await initialiseDBAsync();
+  var db = (await database);
   try {
     await db.transaction((txn) async {
       var id = await txn.insert('NoteDetail', {
         'NoteID': noteId,
-        'CreatedAt': noteDetail.createdAt?.toIso8601String(),
-        'UpdatedAt': noteDetail.updatedAt?.toIso8601String(),
         'Content': noteDetail.content,
       });
+      print('successfully');
     });
   } catch (e) {
     throw Exception(e);
-  } finally {
-    db.close();
   }
 }
 
 Future postNoteReminderAsync(int noteId, NoteReminder noteReminder) async {
-  var db = await initialiseDBAsync();
+  var db = (await database);
   try {
     await db.transaction((txn) async {
       await txn.insert('NoteReminder', {
@@ -77,32 +75,31 @@ Future postNoteReminderAsync(int noteId, NoteReminder noteReminder) async {
     });
   } catch (e) {
     throw Exception(e);
-  } finally {
-    db.close();
   }
 }
 
 Future<List<NoteHeader>> getNotesAsync({String category = category_default}) async {
   String getNotesQuery = category == category_default
       ? '''
-  Select NoteHeader.*,NoteDetail.* from NoteHeader 
-  INNER JOIN NoteDetail ON NoteHeader.ID = NoteDetail.NoteID
+  Select NoteHeader.*, NoteDetail.Content, NoteDetail.ID as DetailID from NoteHeader 
+  LEFT JOIN NoteDetail ON NoteHeader.ID = NoteDetail.NoteID
   '''
       : '''
-  Select NoteHeader.*,NoteDetail.* from NoteHeader 
-  INNER JOIN NoteDetail ON NoteHeader.ID = NoteDetail.NoteID where NoteHeader.CategoryID = ?
+  Select NoteHeader.*, NoteDetail.Content from NoteHeader 
+  LEFT JOIN NoteDetail ON NoteHeader.ID = NoteDetail.NoteID where NoteHeader.CategoryID = ?
   ''';
-  var db = await initialiseDBAsync();
+
+  var db = (await database);
   var results = category == category_default
       ? await db.rawQuery(getNotesQuery)
       : await db.rawQuery(getNotesQuery, [category]);
-
+  print(results.toString());  
   try {
-    return List.generate(results.length, (index) {
+      return List.generate(results.length, (index) {
       return NoteHeader.fromJson(results[index]);
     });
-  } finally {
-    db.close();
+  } catch (e) {
+    throw Exception(e);
   }
 }
 
@@ -113,7 +110,7 @@ Future<NoteHeader?> getNoteAsync(String noteID) async {
   INNER JOIN NoteDetail ON NoteHeader.ID = NoteDetail.NoteID 
   WHERE NoteHeader.ID = ?
   ''';
-  var db = await initialiseDBAsync();
+  var db = (await database);
 
   try {
     var result = (await db.rawQuery(getNoteQuery, [noteID])).first;
@@ -121,14 +118,27 @@ Future<NoteHeader?> getNoteAsync(String noteID) async {
   } on StateError catch (e) {
     print('Unable to fetch note detail with note ID # $noteID ,$e');
     return null;
-  } finally {
-    db.close();
+  }
+}
+
+Future<int?> getLastUpdatedNoteIdAsync() async {
+  String getNoteQuery = 
+  '''
+  Select ID from NoteHeader Order By UpdatedAt DESC LIMIT 1;
+  ''';
+  var db = (await database);
+  try {
+    var result = (await db.rawQuery(getNoteQuery)).first;
+    Map<String, dynamic> json = result;
+    return json['ID'];
+  } on StateError catch (e) {
+    return null;
   }
 }
 
 Future patchNoteAsync(NoteHeader note) async {
   DateTime updatedAt = DateTime.now();
-  var db = await initialiseDBAsync();
+  var db = (await database);
   try {
     await db.transaction((txn) async {
       await txn.update(
@@ -153,22 +163,18 @@ Future patchNoteAsync(NoteHeader note) async {
     });
   } catch (e) {
     throw Exception(e);
-  } finally {
-    db.close();
   }
 }
 
-Future deleteNote(NoteHeader note) async {
+Future deleteNote(int noteId) async {
   DateTime updatedAt = DateTime.now();
-  var db = await openDatabase(dbName);
+  var db = (await database);
   try {
     await db.transaction((txn) async {
-      await txn.delete('NoteHeader', where: 'Id = ?', whereArgs: [note.id]);
-      await txn.delete('NoteDetail', where: 'NoteID = ?', whereArgs: [note.id]);
+      await txn.delete('NoteHeader', where: 'Id = ?', whereArgs: [noteId]);
+      await txn.delete('NoteDetail', where: 'NoteID = ?', whereArgs: [noteId]);
     });
   } catch (e) {
     throw Exception(e);
-  } finally {
-    db.close();
   }
 }

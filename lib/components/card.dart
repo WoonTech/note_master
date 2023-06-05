@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:note_master/components/reminder.dart';
-import 'package:note_master/models/note_header.dart';
+import 'package:note_master/models/noteheader.dart';
 import 'package:intl/intl.dart';
+import '../models/layout.dart';
 import '../models/styling.dart';
-import '../services/note_access.dart';
 
 class CardWidget extends StatefulWidget {
-  final CurrentTheme currentTheme;
+  final LayoutDataProvider currentTheme;
   final double contentHeight;
   final NoteHeader note;
   const CardWidget(
