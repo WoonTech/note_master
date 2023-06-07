@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:note_master/pages/checklistpage.dart';
 import 'package:note_master/pages/homepage.dart';
 import 'package:note_master/models/category.dart';
+import 'package:note_master/pages/notepage.dart';
 import 'package:note_master/services/category_access.dart';
 import 'package:note_master/utils/data_access.dart';
 import 'package:provider/provider.dart';
@@ -36,7 +37,6 @@ class _MyAppState extends State<MyApp> {
     });
     //ensureDBExisted().then((value) => initialize());
     //updateThemeFromSharedPref();
-
   }
 
   @override
@@ -53,20 +53,20 @@ class _MyAppState extends State<MyApp> {
   Future initialize() async {
     //if category is empty, create all
     var categories = await getCategoriesAsync();
-    if(categories.isEmpty){
+    if (categories.isEmpty) {
       var currentTime = DateTime.now();
       var nmNoteCategory = NMCategory(
-        createdAt: currentTime, 
-        updatedAt: currentTime,
-        name: category_default, 
-        status: activeStatus,
-        type: note_type);
+          createdAt: currentTime,
+          updatedAt: currentTime,
+          name: category_default,
+          status: activeStatus,
+          type: note_type);
       var nmChecklistCategory = NMCategory(
-        createdAt: currentTime, 
-        updatedAt: currentTime,
-        name: category_default, 
-        status: activeStatus,
-        type: checklist_type);
+          createdAt: currentTime,
+          updatedAt: currentTime,
+          name: category_default,
+          status: activeStatus,
+          type: checklist_type);
       await postCategoryAsync(nmNoteCategory);
       await postCategoryAsync(nmChecklistCategory);
     }

@@ -17,7 +17,6 @@ String _selectText = 'reminder: 5 days';
 List<String> dropdownList = ['Notes', 'reminder: 10 days', 'reminder: 20 days'];
 
 class HomePage extends StatefulWidget {
-
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -33,9 +32,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> GetCategories() async {
-    List<NMCategory> data = (await getCategoriesAsync())
-      .where((c) => c.type == note_type)
-      .toList(); 
+    List<NMCategory> data =
+        (await getCategoriesAsync()).where((c) => c.type == note_type).toList();
     setState(() {
       categories = data;
     });
@@ -55,17 +53,16 @@ class _HomePageState extends State<HomePage> {
                     Container(
                       color: currentTheme.theme.Theme_Color_SUBDOMAIN,
                     ),
-                    BodyWidget(currentTheme: currentTheme, categories: categories),
+                    BodyWidget(
+                        currentTheme: currentTheme, categories: categories),
                     const SearchBarWidget()
                   ],
                 )),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context, 
-            MaterialPageRoute(builder: (context)=> const NotePage())
-          );
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const NotePage()));
         },
         backgroundColor: Colors.black,
         child: const Icon(
@@ -81,7 +78,8 @@ class _HomePageState extends State<HomePage> {
 class BodyWidget extends StatefulWidget {
   final LayoutDataProvider currentTheme;
   final List<NMCategory> categories;
-  const BodyWidget({required this.currentTheme,required this.categories, super.key});
+  const BodyWidget(
+      {required this.currentTheme, required this.categories, super.key});
 
   @override
   State<BodyWidget> createState() => _BodyWidgetState();
@@ -97,7 +95,7 @@ class _BodyWidgetState extends State<BodyWidget> {
     getNotes();
     _current = 0;
   }
-  
+
   Future<void> getNotes() async {
     List<NoteHeader> data = await getNotesAsync();
     setState(() {

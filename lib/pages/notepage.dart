@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:note_master/components/category.dart';
 import 'package:note_master/models/category.dart';
 import 'package:note_master/models/layout.dart';
 import 'package:note_master/models/notedetail.dart';
@@ -57,24 +58,22 @@ class _NotePageState extends State<NotePage> {
     return '';
   }
 
-  NoteHeader ToNote(){
+  NoteHeader ToNote() {
     var noteHeader = NoteHeader(
-      createdAt: createdAt,
-      updatedAt: updatedAt,
-      title: titleTextEditingController.text,
-      isPinned: isNotePinned,
-      status: activeStatus,
-      category: categoryId
-    );
-    var noteDetail = NoteDetail(
-        content: contentTextEditingController.text);
-    if(reminderAt != null){
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+        title: titleTextEditingController.text,
+        isPinned: isNotePinned,
+        status: activeStatus,
+        category: categoryId);
+    var noteDetail = NoteDetail(content: contentTextEditingController.text);
+    if (reminderAt != null) {
       var noteReminder = NoteReminder(
-        createdAt: createdAt, 
-        updatedAt: updatedAt, 
-        remindedAt: reminderAt ?? DateTime.now(), 
-        repetition: repetition, 
-        notificationText: notificationText);
+          createdAt: createdAt,
+          updatedAt: updatedAt,
+          remindedAt: reminderAt ?? DateTime.now(),
+          repetition: repetition,
+          notificationText: notificationText);
       noteHeader.noteReminder = noteReminder;
     }
     noteHeader.noteDetail = noteDetail;
@@ -84,149 +83,150 @@ class _NotePageState extends State<NotePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Notepad_Color,
-        shadowColor: Colors.transparent,
-        leading: Container(
-          margin: const EdgeInsets.only(left: 20),
-          child: IconButton(
-              onPressed: () {
-                FocusScope.of(context).requestFocus(FocusNode());
-                Navigator.pop(context);
-              },
-              icon: Icon(
-                Icons.arrow_back_ios,
-                color: NotepadIcon_Color,
-              )),
-        ),
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 5),
+        appBar: AppBar(
+          backgroundColor: Notepad_Color,
+          shadowColor: Colors.transparent,
+          leading: Container(
+            margin: const EdgeInsets.only(left: 20),
             child: IconButton(
                 onPressed: () {
-                  //togglePinned();
-                  //Navigator.pop(context);
-                },
-                icon: Icon(
-                  Icons.book,
-                  color: NotepadIcon_Color,
-                )),
-          ),
-          Container(
-            margin: const EdgeInsets.only(right: 5),
-            child: IconButton(
-                onPressed: () {
-                  togglePinned();
-                  //Navigator.pop(context);
-                },
-                icon: Icon(
-                  Icons.star,
-                  color: isNotePinned
-                      ? const Color.fromRGBO(252, 196, 25, 1)
-                      : NotepadIcon_Color,
-                )),
-          ),
-          Container(
-            margin: const EdgeInsets.only(right: 5),
-            child: IconButton(
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return const ReminderAlertBoxWidget();
-                      });
-                },
-                icon: Icon(
-                  Icons.notifications,
-                  color: isReminderSet
-                      ? const Color.fromRGBO(37, 87, 218, 1)
-                      : NotepadIcon_Color,
-                )),
-          ),
-          Container(
-            margin: const EdgeInsets.only(right: 20),
-            child: IconButton(
-                onPressed: () {
-                  updatedAt = DateTime.now();
-                  var titleText = titleTextEditingController.text;
-                  if (titleText.isEmpty) {
-                    titleTextEditingController.text =
-                        updateTitle(contentTextEditingController.text);
-                  }
-                  var noteHeader = ToNote();
-                  saveNoteAsync(noteHeader);
-                    setState(() {
-                      Provider.of<LayoutDataProvider>(context,listen: false).addLatestNoteToList(noteHeader);
-                    });
                   FocusScope.of(context).requestFocus(FocusNode());
+                  Navigator.pop(context);
                 },
                 icon: Icon(
-                  Icons.check,
+                  Icons.arrow_back_ios,
                   color: NotepadIcon_Color,
                 )),
           ),
-        ],
-      ),
-      body: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).requestFocus(FocusNode());
-        },
-        child: Container(
-          color: Notepad_Color,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 40,
-                ),
-                TextField(
-                  controller: titleTextEditingController,
-                  decoration: InputDecoration.collapsed(
-                    hintText: 'Title',
-                    hintStyle: TextStyle(
-                        color: Font_Color_DETAILS,
-                        fontSize: Font_Size_TITLE,
-                        fontFamily: Font_Family_LATO,
-                        fontWeight: FontWeight.bold),
-                    border: InputBorder.none,
-                  ),
-                  style: TextStyle(
-                      fontFamily: Font_Family_LATO,
-                      fontSize: Font_Size_TITLE,
-                      fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.left,
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Text(
-                  DateFormat('d, MMM dd h:mm a').format(createdAt),
-                  style: TextStyle(
-                      fontFamily: Font_Family_LATO,
-                      fontSize: Font_Size_DIALOG,
-                      color: Font_Color_DETAILS),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(
-                  height: 35,
-                ),
-                Expanded(
-                  child: NotePad(
-                    textEditingController: contentTextEditingController,
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-              ],
+          actions: [
+            Container(
+              margin: const EdgeInsets.only(right: 5),
+              child: IconButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const CategoryAlertBoxWidget();
+                        });
+                  },
+                  icon: Icon(
+                    Icons.book,
+                    color: NotepadIcon_Color,
+                  )),
             ),
-          )
-        )
-      )
-    );
+            Container(
+              margin: const EdgeInsets.only(right: 5),
+              child: IconButton(
+                  onPressed: () {
+                    togglePinned();
+                    //Navigator.pop(context);
+                  },
+                  icon: Icon(
+                    Icons.star,
+                    color: isNotePinned
+                        ? const Color.fromRGBO(252, 196, 25, 1)
+                        : NotepadIcon_Color,
+                  )),
+            ),
+            Container(
+              margin: const EdgeInsets.only(right: 5),
+              child: IconButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const ReminderAlertBoxWidget();
+                        });
+                  },
+                  icon: Icon(
+                    Icons.notifications,
+                    color: isReminderSet
+                        ? const Color.fromRGBO(37, 87, 218, 1)
+                        : NotepadIcon_Color,
+                  )),
+            ),
+            Container(
+              margin: const EdgeInsets.only(right: 20),
+              child: IconButton(
+                  onPressed: () {
+                    updatedAt = DateTime.now();
+                    var titleText = titleTextEditingController.text;
+                    if (titleText.isEmpty) {
+                      titleTextEditingController.text =
+                          updateTitle(contentTextEditingController.text);
+                    }
+                    var noteHeader = ToNote();
+                    saveNoteAsync(noteHeader);
+                    setState(() {
+                      Provider.of<LayoutDataProvider>(context, listen: false)
+                          .addLatestNoteToList(noteHeader);
+                    });
+                    FocusScope.of(context).requestFocus(FocusNode());
+                  },
+                  icon: Icon(
+                    Icons.check,
+                    color: NotepadIcon_Color,
+                  )),
+            ),
+          ],
+        ),
+        body: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
+            child: Container(
+                color: Notepad_Color,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        height: 40,
+                      ),
+                      TextField(
+                        controller: titleTextEditingController,
+                        decoration: InputDecoration.collapsed(
+                          hintText: 'Title',
+                          hintStyle: TextStyle(
+                              color: Font_Color_DETAILS,
+                              fontSize: Font_Size_TITLE,
+                              fontFamily: Font_Family_LATO,
+                              fontWeight: FontWeight.bold),
+                          border: InputBorder.none,
+                        ),
+                        style: TextStyle(
+                            fontFamily: Font_Family_LATO,
+                            fontSize: Font_Size_TITLE,
+                            fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.left,
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Text(
+                        DateFormat('d, MMM dd h:mm a').format(createdAt),
+                        style: TextStyle(
+                            fontFamily: Font_Family_LATO,
+                            fontSize: Font_Size_DIALOG,
+                            color: Font_Color_DETAILS),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(
+                        height: 35,
+                      ),
+                      Expanded(
+                        child: NotePad(
+                          textEditingController: contentTextEditingController,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                    ],
+                  ),
+                ))));
   }
 }
 

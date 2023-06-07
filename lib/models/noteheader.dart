@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:note_master/constants/status.dart';
 import 'package:note_master/models/notedetail.dart';
 import 'package:note_master/models/notereminder.dart';
@@ -33,19 +31,18 @@ class NoteHeader {
         isPinned: bool.fromEnvironment(json['IsPinned']),
         status: json['Status'],
         category: json['CategoryID']);
-    noteHeader.noteDetail = NoteDetail(
-      id: json['DetailID'],
-      content: json['Content']);
+    noteHeader.noteDetail =
+        NoteDetail(id: json['DetailID'], content: json['Content']);
     var notificationId = json['NoteReminder.ID'];
-    if(notificationId != null){
+    if (notificationId != null) {
       noteHeader.noteReminder = NoteReminder(
-        id: json['NoteReminder.ID'],
-        noteId: json['NoteReminder.NoteID'],
-        createdAt: DateTime.parse(json['NoteReminder.CreatedAt']),
-        updatedAt: DateTime.parse(json['NoteReminder.UpdatedAt']),
-        remindedAt: DateTime.parse(json['NoteReminder.RemindedAt']), 
-        repetition: json['NoteReminder.Repetition'], 
-        notificationText: json['NoteReminder.NotificationText']);
+          id: json['NoteReminder.ID'],
+          noteId: json['NoteReminder.NoteID'],
+          createdAt: DateTime.parse(json['NoteReminder.CreatedAt']),
+          updatedAt: DateTime.parse(json['NoteReminder.UpdatedAt']),
+          remindedAt: DateTime.parse(json['NoteReminder.RemindedAt']),
+          repetition: json['NoteReminder.Repetition'],
+          notificationText: json['NoteReminder.NotificationText']);
     }
     return noteHeader;
   }
