@@ -28,7 +28,7 @@ class NoteHeader {
         createdAt: DateTime.parse(json['CreatedAt']),
         updatedAt: DateTime.parse(json['UpdatedAt']),
         title: json['Title'],
-        isPinned: bool.fromEnvironment(json['IsPinned']),
+        isPinned: json['IsPinned'] == "true" ? true : false,
         status: json['Status'],
         category: json['CategoryID']);
     noteHeader.noteDetail =

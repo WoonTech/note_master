@@ -39,68 +39,74 @@ class _CardWidgetState extends State<CardWidget> {
                         left: BorderSide(
                             color: widget.currentTheme.theme.Theme_Color_ROOT,
                             width: 7))),
-                child: Column(
-                  children: <Widget>[
-                    ListTileTheme(
-                      contentPadding: const EdgeInsets.only(left: 10),
-                      dense: true,
-                      horizontalTitleGap: 0.0,
-                      minLeadingWidth: 0,
-                      child: ExpansionTile(
-                        backgroundColor: Colors.transparent,
-                        shape: const RoundedRectangleBorder(
-                            side: BorderSide(color: Colors.transparent)),
-                        title: Text(
-                          widget.note.title.toString(),
-                          style: TextStyle(
-                            fontFamily: Font_Family_LATO,
-                            fontSize: Font_Size_HEADER,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black,
-                          ),
-                        ),
-
-                        trailing: IconButton(
-                            onPressed: () {},
-                            icon: Icon(
-                              Icons.star_border,
-                              size: 20,
-                              color: Font_Color_UNSELECTED,
-                            )),
-                        //inkwellFactory: NoSplashFactory(),
-                        children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 10.0),
-                            child: Expanded(
-                                child: Text(
-                              widget.note.noteDetail!.content,
+                child: Padding(
+                  padding: 
+                    const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 5),
+                  child: Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          children: [
+                            Text(
+                              widget.note.title.toString(),
+                              maxLines: 1,
+                              textAlign: TextAlign.left,
                               style: TextStyle(
-                                  color: Font_Color_Default,
+                                fontFamily: Font_Family_LATO,
+                                fontSize: Font_Size_HEADER,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                              ),
+                            ),
+                            /*const Expanded(child: SizedBox()),*/
+                            Icon(
+                              Icons.star,
+                              color: widget.note.isPinned
+                              ?const Color.fromRGBO(252, 196, 25, 1)
+                              : Colors.transparent
+                            ),
+                          ],
+                        ),
+                        /*const SizedBox(height: 15,),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.note.noteDetail!.content,
+                              maxLines: 3,
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  color: Font_Color_Content,
                                   fontSize: Font_Size_CONTENT,
                                   fontFamily: Font_Family_LATO,
                                   fontWeight: FontWeight.w500),
-                            )),
-                          )
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(left: 10, right: 10, bottom: 5),
-                      child: Row(children: [
-                        Text(
-                          DateFormat('d, MMM dd h:mm a').format(widget.note.createdAt),
-                          style: TextStyle(
-                              color: Font_Color_SUBDOMAIN,
-                              fontSize: Font_Size_CONTENT,
-                              fontFamily: Font_Family_LATO),
+                                    ),
+                          ],
                         ),
-                        const Expanded(child: SizedBox()),
-                        NotificationWidget(),
-                      ]),
-                    )
-                  ],
-                ))));
+                        const SizedBox(height: 5,),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                            DateFormat('d, MMM dd h:mm a').format(widget.note.createdAt),
+                            style: TextStyle(
+                                color: Font_Color_SUBDOMAIN,
+                                fontSize: Font_Size_CONTENT,
+                                fontFamily: Font_Family_LATO),
+                            ),
+                            const Expanded(child: SizedBox()),
+                            NotificationWidget()
+                          ],
+                        ),
+                      */],
+                      ),
+                    ],      
+                  ), 
+              )
+            )
+          )
+        );
   }
 }

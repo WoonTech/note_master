@@ -81,11 +81,11 @@ Future postNoteReminderAsync(int noteId, NoteReminder noteReminder) async {
 Future<List<NoteHeader>> getNotesAsync({String category = category_default}) async {
   String getNotesQuery = category == category_default
       ? '''
-  Select NoteHeader.*, NoteDetail.Content, NoteDetail.ID as DetailID from NoteHeader 
+  Select NoteHeader.*, NoteHeader.IsPinned as Pinned, NoteDetail.Content, NoteDetail.ID as DetailID from NoteHeader 
   LEFT JOIN NoteDetail ON NoteHeader.ID = NoteDetail.NoteID
   '''
       : '''
-  Select NoteHeader.*, NoteDetail.Content from NoteHeader 
+  Select NoteHeader.*, NoteDetail.Content, NoteDetail.ID as DetailID from NoteHeader 
   LEFT JOIN NoteDetail ON NoteHeader.ID = NoteDetail.NoteID where NoteHeader.CategoryID = ?
   ''';
 
@@ -93,7 +93,6 @@ Future<List<NoteHeader>> getNotesAsync({String category = category_default}) asy
   var results = category == category_default
       ? await db.rawQuery(getNotesQuery)
       : await db.rawQuery(getNotesQuery, [category]);
-  print(results.toString());  
   try {
       return List.generate(results.length, (index) {
       return NoteHeader.fromJson(results[index]);
