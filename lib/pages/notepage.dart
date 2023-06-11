@@ -11,9 +11,12 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../components/reminder.dart';
 import '../constants/status.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class NotePage extends StatefulWidget {
-  const NotePage({super.key});
+  NoteHeader? currentNote;
+
+  NotePage({this.currentNote, super.key});
 
   @override
   State<NotePage> createState() => _NotePageState();
@@ -28,11 +31,24 @@ class _NotePageState extends State<NotePage> {
   DateTime? reminderAt;
   int repetition = 0;
   String notificationText = '';
-  late bool isPinned;
   late String status;
   String categoryId = category_default;
   TextEditingController contentTextEditingController = TextEditingController();
   TextEditingController titleTextEditingController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    if (widget.currentNote != null) {
+      isNotePinned = widget.currentNote!.isPinned;
+      contentTitle = widget.currentNote!.title;
+      createdAt = widget.currentNote!.createdAt;
+      status = widget.currentNote!.status;
+      categoryId = widget.currentNote!.category;
+      titleTextEditingController.text = widget.currentNote!.title;
+      contentTextEditingController.text =
+          widget.currentNote!.noteDetail!.content;
+    }
+  }
 
   void togglePinned() {
     setState(() {
@@ -60,6 +76,7 @@ class _NotePageState extends State<NotePage> {
 
   NoteHeader ToNote() {
     var noteHeader = NoteHeader(
+        id: widget.currentNote != null ? widget.currentNote!.id : null,
         createdAt: createdAt,
         updatedAt: updatedAt,
         title: titleTextEditingController.text,
@@ -67,15 +84,11 @@ class _NotePageState extends State<NotePage> {
         status: activeStatus,
         category: categoryId);
     var noteDetail = NoteDetail(content: contentTextEditingController.text);
-    if (reminderAt != null) {
-      var noteReminder = NoteReminder(
-          createdAt: createdAt,
-          updatedAt: updatedAt,
-          remindedAt: reminderAt ?? DateTime.now(),
-          repetition: repetition,
-          notificationText: notificationText);
-      noteHeader.noteReminder = noteReminder;
-    }
+    var noteReminder = NoteReminder(
+        remindedAt: reminderAt ?? DateTime.utc(1999, 1, 1),
+        repetition: repetition,
+        notificationText: notificationText);
+    noteHeader.noteReminder = noteReminder;
     noteHeader.noteDetail = noteDetail;
     return noteHeader;
   }
@@ -155,13 +168,17 @@ class _NotePageState extends State<NotePage> {
                       titleTextEditingController.text =
                           updateTitle(contentTextEditingController.text);
                     }
-                    var noteHeader = ToNote();
-                    saveNoteAsync(noteHeader);
-                    setState(() {
-                      Provider.of<LayoutDataProvider>(context, listen: false)
-                          .addLatestNoteToList(noteHeader);
+                    widget.currentNote = ToNote();
+                    saveNoteAsync(widget.currentNote!)
+                        .then((value) => widget.currentNote = value)
+                        .whenComplete(() {
+                      setState(() {
+                        Provider.of<LayoutDataProvider>(context, listen: false)
+                            .addLatestNoteToList(widget.currentNote!);
+                      });
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      Fluttertoast.showToast(msg: "Note saved successfully!");
                     });
-                    FocusScope.of(context).requestFocus(FocusNode());
                   },
                   icon: Icon(
                     Icons.check,
@@ -206,7 +223,7 @@ class _NotePageState extends State<NotePage> {
                         height: 15,
                       ),
                       Text(
-                        DateFormat('d, MMM dd h:mm a').format(createdAt),
+                        formattedDate.format(createdAt),
                         style: TextStyle(
                             fontFamily: Font_Family_LATO,
                             fontSize: Font_Size_DIALOG,
@@ -243,7 +260,7 @@ class _NotePadState extends State<NotePad> {
   Widget build(BuildContext context) {
     return TextField(
       maxLines: null,
-      autofocus: true,
+      autofocus: widget.textEditingController.text == "" ? true : false,
       controller: widget.textEditingController,
       keyboardType: TextInputType.multiline,
       decoration: const InputDecoration(

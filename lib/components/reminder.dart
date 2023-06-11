@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:note_master/models/notereminder.dart';
 
 import '../models/styling.dart';
 import 'buttonbar.dart';
@@ -17,26 +18,24 @@ List<String> reminderDropDownList = [
   'yearly'
 ];
 
-class NotificationWidget extends StatelessWidget {
-  const NotificationWidget({super.key});
+class NotificationWidget extends StatefulWidget {
+  final NoteReminder noteReminder;
+  const NotificationWidget({required this.noteReminder, super.key});
 
   @override
+  State<NotificationWidget> createState() => _NotificationWidgetState();
+}
+
+class _NotificationWidgetState extends State<NotificationWidget> {
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return const ReminderAlertBoxWidget();
-            });
-      },
-      child: Text(
-        'reminder: none',
-        style: TextStyle(
-          color: Font_Color_SUBDOMAIN,
-          fontSize: Font_Size_CONTENT,
-          fontFamily: Font_Family_LATO,
-        ),
+    var reminderAt = widget.noteReminder.remindedAt.difference(DateTime.now());
+    return Text(
+      reminderAt > Duration.zero ? 'reminder: $reminderAt' : '',
+      style: TextStyle(
+        color: Font_Color_SUBDOMAIN,
+        fontSize: Font_Size_CONTENT,
+        fontFamily: Font_Family_LATO,
       ),
     );
   }
@@ -50,6 +49,7 @@ class ReminderAlertBoxWidget extends StatefulWidget {
 }
 
 class _ReminderAlertBoxWidgetState extends State<ReminderAlertBoxWidget> {
+  DateTime? currentReminder;
   @override
   Widget build(BuildContext context) {
     return AlertDialog(

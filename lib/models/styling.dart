@@ -34,4 +34,4 @@ Color Notepad_Color = const Color.fromRGBO(245, 245, 245, 1);
 Color NotepadIcon_Color = Colors.black;
 
 //DateTime Format
-DateFormat formattedDate = DateFormat('dd.MM.yyyy HH:mm:ss');
+DateFormat formattedDate = DateFormat('d, MMM dd h:mm a');

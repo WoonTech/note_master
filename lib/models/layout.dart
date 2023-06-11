@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -15,8 +17,9 @@ Color Theme_Color_SYSTEM = const Color.fromRGBO(37, 87, 218, 1);
 
 //Parameter
 int Category = 0;
-List<NoteHeader> notes = []; 
+HashMap<int, NoteHeader> notes = HashMap();
 List<NMCategory> categories = [];
+DateTime? reminderAt;
 
 class BackgroundTheme {
   Color Theme_Color_ROOT;
@@ -24,7 +27,7 @@ class BackgroundTheme {
   Color Theme_Color_SUBDOMAIN;
   int Category;
   BackgroundTheme(this.Theme_Color_ROOT, this.Theme_Color_DOMAIN,
-      this.Theme_Color_SUBDOMAIN,this.Category) {
+      this.Theme_Color_SUBDOMAIN, this.Category) {
     SetSystemBarColor(Theme_Color_DOMAIN);
   }
 }
@@ -35,7 +38,7 @@ class LayoutDataProvider extends ChangeNotifier {
 
   BackgroundTheme get theme => _theme;
 
-  void initialize(){
+  void initialize() {
     setThemeStyle(0);
   }
 
@@ -80,27 +83,29 @@ class LayoutDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addLatestNoteToList(NoteHeader noteHeader){
-    notes.add(noteHeader);
+  void addLatestNoteToList(NoteHeader noteHeader) {
+    notes[noteHeader.id!] = noteHeader;
     notifyListeners();
   }
 
   Future<void> getNoteCategories() async {
-    categories = (await getCategoriesAsync())
-      .where((c) => c.type == note_type)
-      .toList();
+    categories =
+        (await getCategoriesAsync()).where((c) => c.type == note_type).toList();
     notifyListeners();
   }
 
   Future<void> getCheckListCategories() async {
     categories = (await getCategoriesAsync())
-      .where((c) => c.type == checklist_type)
-      .toList(); 
+        .where((c) => c.type == checklist_type)
+        .toList();
     notifyListeners();
   }
 
   Future<void> getNote() async {
-    notes = await getNotesAsync();
+    var cacheNotes = await getNotesAsync();
+    for (var cacheNote in cacheNotes) {
+      notes[cacheNote.id!] = cacheNote;
+    }
     notifyListeners();
   }
 }

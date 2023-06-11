@@ -1,3 +1,4 @@
+import 'package:note_master/models/layout.dart';
 import 'package:note_master/models/notereminder.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -6,25 +7,25 @@ import '../models/notedetail.dart';
 import '../models/noteheader.dart';
 import '../utils/data_access.dart';
 
-Future saveNoteAsync(NoteHeader noteHeader) async {
-  if(noteHeader.id == null){
-    await postNoteAsync(noteHeader);
-  }
-  else{
-    await patchNoteAsync(noteHeader);
+Future<NoteHeader> saveNoteAsync(NoteHeader noteHeader) async {
+  if (noteHeader.id == null) {
+    return await postNoteAsync(noteHeader);
+  } else {
+    return await patchNoteAsync(noteHeader);
   }
 }
 
-Future postNoteAsync(NoteHeader noteHeader) async {
+Future<NoteHeader> postNoteAsync(NoteHeader noteHeader) async {
   await postNoteHeaderAsync(noteHeader);
   var latestNoteId = await getLastUpdatedNoteIdAsync() ?? 0;
-  if(latestNoteId != 0){
+  if (latestNoteId != 0) {
+    noteHeader.id = latestNoteId;
     await postNoteDetailAsync(latestNoteId, noteHeader.noteDetail!);
-    if(noteHeader.noteReminder != null){
-      await postNoteReminderAsync(latestNoteId, noteHeader.noteReminder!);
-    }
+    noteHeader.noteDetail?.id = await getNoteDetailsIdAsync(latestNoteId);
+    await postNoteReminderAsync(latestNoteId, noteHeader.noteReminder!);
+    noteHeader.noteReminder?.id = await getNoteRemindersIdAsync(latestNoteId);
   }
-
+  return noteHeader;
 }
 
 Future<int?> postNoteHeaderAsync(NoteHeader noteHeader) async {
@@ -66,9 +67,7 @@ Future postNoteReminderAsync(int noteId, NoteReminder noteReminder) async {
     await db.transaction((txn) async {
       await txn.insert('NoteReminder', {
         'NoteID': noteId,
-        'CreatedAt': noteReminder.createdAt.toIso8601String(),
-        'UpdatedAt': noteReminder.updatedAt.toIso8601String(),
-        'Content': noteReminder.remindedAt.toIso8601String(),
+        'ReminderAt': noteReminder.remindedAt.toIso8601String(),
         'Repetition': noteReminder.repetition,
         'NotificationText': noteReminder.notificationText
       });
@@ -78,15 +77,23 @@ Future postNoteReminderAsync(int noteId, NoteReminder noteReminder) async {
   }
 }
 
-Future<List<NoteHeader>> getNotesAsync({String category = category_default}) async {
+Future<List<NoteHeader>> getNotesAsync(
+    {String category = category_default}) async {
   String getNotesQuery = category == category_default
       ? '''
-  Select NoteHeader.*, NoteHeader.IsPinned as Pinned, NoteDetail.Content, NoteDetail.ID as DetailID from NoteHeader 
+  Select NoteHeader.*, 
+  NoteDetail.ID as DetailID, NoteDetail.Content, 
+  NoteReminder.ID as ReminderID, NoteReminder.ReminderAt as ReminderAt, NoteReminder.Repetition as Repetition, NoteReminder.NotificationText as NotificationText from NoteHeader 
   LEFT JOIN NoteDetail ON NoteHeader.ID = NoteDetail.NoteID
+  LEFT JOIN NoteReminder ON NoteHeader.ID = NoteReminder.NoteID
   '''
       : '''
-  Select NoteHeader.*, NoteDetail.Content, NoteDetail.ID as DetailID from NoteHeader 
-  LEFT JOIN NoteDetail ON NoteHeader.ID = NoteDetail.NoteID where NoteHeader.CategoryID = ?
+  Select NoteHeader.*,
+  NoteDetail.ID as DetailID, NoteDetail.Content, 
+  NoteReminder.ID as ReminderID, NoteReminder.ReminderAt as ReminderAt, NoteReminder.Repetition as Repetition, NoteReminder.NotificationText as NotificationText from NoteHeader 
+  LEFT JOIN NoteDetail ON NoteHeader.ID = NoteDetail.NoteID
+  LEFT JOIN NoteReminder ON NoteHeader.ID = NoteReminder.NoteID
+  where NoteHeader.CategoryID = ?
   ''';
 
   var db = (await database);
@@ -94,7 +101,7 @@ Future<List<NoteHeader>> getNotesAsync({String category = category_default}) asy
       ? await db.rawQuery(getNotesQuery)
       : await db.rawQuery(getNotesQuery, [category]);
   try {
-      return List.generate(results.length, (index) {
+    return List.generate(results.length, (index) {
       return NoteHeader.fromJson(results[index]);
     });
   } catch (e) {
@@ -103,8 +110,7 @@ Future<List<NoteHeader>> getNotesAsync({String category = category_default}) asy
 }
 
 Future<NoteHeader?> getNoteAsync(String noteID) async {
-  String getNoteQuery = 
-  '''
+  String getNoteQuery = '''
   Select NoteHeader.*,NoteDetail.* from NoteHeader 
   INNER JOIN NoteDetail ON NoteHeader.ID = NoteDetail.NoteID 
   WHERE NoteHeader.ID = ?
@@ -121,9 +127,8 @@ Future<NoteHeader?> getNoteAsync(String noteID) async {
 }
 
 Future<int?> getLastUpdatedNoteIdAsync() async {
-  String getNoteQuery = 
-  '''
-  Select ID from NoteHeader Order By UpdatedAt DESC LIMIT 1;
+  String getNoteQuery = '''
+  Select ID from NoteHeader Order By ID DESC LIMIT 1;
   ''';
   var db = (await database);
   try {
@@ -135,7 +140,35 @@ Future<int?> getLastUpdatedNoteIdAsync() async {
   }
 }
 
-Future patchNoteAsync(NoteHeader note) async {
+Future<int?> getNoteDetailsIdAsync(int noteId) async {
+  String getNoteQuery = '''
+  Select ID from NoteDetail Where NoteID= ? LIMIT 1;
+  ''';
+  var db = (await database);
+  try {
+    var result = (await db.rawQuery(getNoteQuery, [noteId])).first;
+    Map<String, dynamic> json = result;
+    return json['ID'];
+  } on StateError catch (e) {
+    return 0;
+  }
+}
+
+Future<int?> getNoteRemindersIdAsync(int noteId) async {
+  String getNoteQuery = '''
+  Select ID from NoteReminder Where NoteID= ? LIMIT 1;
+  ''';
+  var db = (await database);
+  try {
+    var result = (await db.rawQuery(getNoteQuery, [noteId])).first;
+    Map<String, dynamic> json = result;
+    return json['ID'];
+  } on StateError catch (e) {
+    return 0;
+  }
+}
+
+Future<NoteHeader> patchNoteAsync(NoteHeader note) async {
   DateTime updatedAt = DateTime.now();
   var db = (await database);
   try {
@@ -144,7 +177,7 @@ Future patchNoteAsync(NoteHeader note) async {
           'NoteHeader',
           {
             'UpdatedAt': updatedAt.toIso8601String(),
-            'Title': note.title?.trim(),
+            'Title': note.title.trim(),
             'IsPinned': note.isPinned.toString(),
             'Status': note.status,
             'CategoryID': note.category
@@ -154,12 +187,22 @@ Future patchNoteAsync(NoteHeader note) async {
       await txn.update(
           'NoteDetail',
           {
-            'UpdatedAt': updatedAt.toIso8601String(),
             'Content': note.noteDetail?.content,
           },
           where: 'NoteID = ?',
           whereArgs: [note.id]);
+      await txn.update(
+          'NoteReminder',
+          {
+            'ReminderAt': note.noteReminder?.remindedAt.toIso8601String(),
+            'Repetition': note.noteReminder?.repetition,
+            'NotificationText': note.noteReminder?.notificationText
+          },
+          where: 'NoteID = ?',
+          whereArgs: [note.id]);
     });
+    note.updatedAt = updatedAt;
+    return note;
   } catch (e) {
     throw Exception(e);
   }

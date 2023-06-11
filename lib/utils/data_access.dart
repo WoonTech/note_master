@@ -8,7 +8,6 @@ import 'package:synchronized/synchronized.dart';
 final Future<Database> database = SQLDataAccess().database;
 
 class SQLDataAccess {
-
   String dbName = 'note_master_db.db';
 
   // Singleton pattern
@@ -17,15 +16,15 @@ class SQLDataAccess {
   SQLDataAccess._internal();
   static Database? _database;
 
-  Future<Database> get database async{
-    if(_database == null){
+  Future<Database> get database async {
+    if (_database == null) {
       var db = await initialiseDBAsync();
       _database = db;
     }
     return _database!;
   }
 
-  Future<Database> initialiseDBAsync() async{
+  Future<Database> initialiseDBAsync() async {
     //Create Note Header
     final directory = await getDatabasesPath();
     String path = join(directory, dbName);
@@ -33,7 +32,7 @@ class SQLDataAccess {
     String createNoteDetailQuery = getCreateNoteDetailQuery();
     String createCategoryQuery = getCreateCategoryQuery();
     String createNoteReminderQuery = getCreateNoteReminderQuery();
-    return await openDatabase(
+    var db = await openDatabase(
       path,
       version: 1,
       onCreate: (db, version) async {
@@ -45,6 +44,8 @@ class SQLDataAccess {
         });
       },
     );
+    //cleanNoteTable(db);
+    return db;
   }
 
   String getCreateNoteHeaderQuery() {
@@ -66,8 +67,6 @@ class SQLDataAccess {
     CREATE TABLE NoteDetail (
       ID INTEGER PRIMARY KEY,
       NoteID TEXT,
-      CreatedAt TEXT,
-      UpdatedAt TEXT,
       Content TEXT
     )
     ''';
@@ -91,8 +90,7 @@ class SQLDataAccess {
     return '''
       CREATE TABLE NoteReminder (
         ID INTEGER PRIMARY KEY AUTOINCREMENT,
-        CreatedAt TEXT,
-        UpdatedAt TEXT,
+        NoteID TEXT,
         ReminderAt TEXT,
         Repetition TEXT,
         NotificationText TEXT
@@ -111,4 +109,14 @@ class SQLDataAccess {
       )
     ''';  
   }*/
+}
+
+/*void addColumnToTable(Database database) async {
+  await database.execute('ALTER TABLE NoteReminder ADD COLUMN NoteID TEXT');
+}*/
+
+void cleanNoteTable(Database database) async {
+  await database.execute('Delete From NoteHeader');
+  await database.execute('Delete From NoteDetail');
+  await database.execute('Delete From NoteReminder');
 }

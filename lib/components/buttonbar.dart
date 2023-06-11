@@ -8,7 +8,7 @@ class ButtonBarFieldWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ButtonBar(  
+    return ButtonBar(
       alignment: MainAxisAlignment.spaceEvenly,
       mainAxisSize: MainAxisSize.max,
       layoutBehavior: ButtonBarLayoutBehavior.constrained,
@@ -25,7 +25,9 @@ class ButtonBarFieldWidget extends StatelessWidget {
           ),
         ),
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
           child: Text(
             'DONE',
             style: TextStyle(
@@ -34,7 +36,7 @@ class ButtonBarFieldWidget extends StatelessWidget {
               color: Theme_Color_SYSTEM,
             ),
           ),
-        ),         
+        ),
       ],
     );
   }

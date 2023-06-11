@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:note_master/models/layout.dart';
+import 'package:intl/intl.dart';
 import '../models/styling.dart';
-
-DateTime? reminderTime;
 
 class DateTimeFieldWidget extends StatefulWidget {
   const DateTimeFieldWidget({super.key});
@@ -12,10 +11,9 @@ class DateTimeFieldWidget extends StatefulWidget {
 }
 
 class _DateTimeFieldWidgetState extends State<DateTimeFieldWidget> {
-  DateTime? reminderTime;
   void SetReminder(DateTime? dateTime) {
     setState(() {
-      reminderTime = dateTime;
+      reminderAt = dateTime;
     });
   }
 
@@ -49,9 +47,9 @@ class _DateTimeFieldWidgetState extends State<DateTimeFieldWidget> {
                   ).then((value) => SetReminder(value));
                 },
                 child: Text(
-                  reminderTime == null
-                      ? "Reminder Time"
-                      : reminderTime.toString(),
+                  reminderAt == null
+                      ? "none"
+                      : formattedDate.format(reminderAt!),
                   style: TextStyle(
                       fontFamily: Font_Family_LATO,
                       fontSize: Font_Size_DIALOG,

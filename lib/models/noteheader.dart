@@ -25,24 +25,22 @@ class NoteHeader {
   factory NoteHeader.fromJson(Map<String, dynamic> json) {
     var noteHeader = NoteHeader(
         id: json['ID'],
-        createdAt: DateTime.parse(json['CreatedAt']),
-        updatedAt: DateTime.parse(json['UpdatedAt']),
+        createdAt: DateTime.parse(json['CreatedAt']).toLocal(),
+        updatedAt: DateTime.parse(json['UpdatedAt']).toLocal(),
         title: json['Title'],
         isPinned: json['IsPinned'] == "true" ? true : false,
         status: json['Status'],
         category: json['CategoryID']);
-    noteHeader.noteDetail =
-        NoteDetail(id: json['DetailID'], content: json['Content']);
+    noteHeader.noteDetail = NoteDetail(
+        id: json['DetailID'], noteId: json['ID'], content: json['Content']);
     var notificationId = json['NoteReminder.ID'];
     if (notificationId != null) {
       noteHeader.noteReminder = NoteReminder(
-          id: json['NoteReminder.ID'],
-          noteId: json['NoteReminder.NoteID'],
-          createdAt: DateTime.parse(json['NoteReminder.CreatedAt']),
-          updatedAt: DateTime.parse(json['NoteReminder.UpdatedAt']),
-          remindedAt: DateTime.parse(json['NoteReminder.RemindedAt']),
-          repetition: json['NoteReminder.Repetition'],
-          notificationText: json['NoteReminder.NotificationText']);
+          id: json['ReminderID'],
+          noteId: json['ID'],
+          remindedAt: DateTime.parse(json['RemindedAt']),
+          repetition: json['Repetition'],
+          notificationText: json['NotificationText']);
     }
     return noteHeader;
   }

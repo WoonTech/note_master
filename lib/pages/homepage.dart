@@ -61,8 +61,8 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const NotePage()));
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => NotePage()));
         },
         backgroundColor: Colors.black,
         child: const Icon(
@@ -97,9 +97,11 @@ class _BodyWidgetState extends State<BodyWidget> {
   }
 
   Future<void> getNotes() async {
-    List<NoteHeader> data = await getNotesAsync();
+    var cacheNotes = await getNotesAsync();
     setState(() {
-      notes = data;
+      for (var cacheNote in cacheNotes) {
+        notes[cacheNote.id!] = cacheNote;
+      }
     });
   }
 
@@ -151,9 +153,9 @@ class _BodyWidgetState extends State<BodyWidget> {
                             )
                           ])),
                           Text(
-                            '60 notes',
+                            '${notes.length} notes',
                             style: TextStyle(
-                                fontSize: 16, color: Theme_Color_SUBDOMAIN),
+                                fontSize: 16, color: Font_Color_Default),
                           ),
                           const SizedBox(
                             width: 15,
@@ -224,15 +226,15 @@ class _BodyWidgetState extends State<BodyWidget> {
                               itemBuilder: (context, index) {
                                 return GestureDetector(
                                     onTap: () {
-                                      setState(() {
-                                        _contentHeight = _contentHeight ==
-                                                Expansion_Height_UNTAP
-                                            ? Expansion_Height_TAP
-                                            : Expansion_Height_UNTAP;
-                                      });
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => NotePage(
+                                                  currentNote: notes.values
+                                                      .elementAt(index))));
                                     },
                                     child: CardWidget(
-                                      note: notes[index],
+                                      note: notes.values.elementAt(index),
                                       currentTheme: widget.currentTheme,
                                       contentHeight: _contentHeight,
                                     ));
