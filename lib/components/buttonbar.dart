@@ -1,10 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:note_master/models/layout.dart';
 
+import '../models/notereminder.dart';
 import '../models/styling.dart';
 
-class ButtonBarFieldWidget extends StatelessWidget {
-  const ButtonBarFieldWidget({super.key});
+class ButtonBarWidget extends StatefulWidget {
+  NoteReminder? noteReminder;
+  ButtonBarWidget({this.noteReminder, super.key});
+
+  @override
+  State<ButtonBarWidget> createState() => _ButtonBarWidgetState();
+}
+
+class _ButtonBarWidgetState extends State<ButtonBarWidget> {
+
+  bool isReminderOver(DateTime? reminderTime){
+    return reminderTime!.difference(DateTime.now()) > Duration.zero;
+  }
+
+  void toggleReminder(DateTime? reminderAt) {
+    if (isReminderOver(reminderAt)) {
+      setState(() {
+        currentNote!.noteReminder!.notificationText = widget.noteReminder!.notificationText;
+        currentNote!.noteReminder!.remindedAt = widget.noteReminder!.remindedAt;
+        currentNote!.noteReminder!.repetitionId = widget.noteReminder!.repetitionId;
+      });
+    }
+  }
+  void resetReminder(NoteReminder noteReminder){
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +38,9 @@ class ButtonBarFieldWidget extends StatelessWidget {
       layoutBehavior: ButtonBarLayoutBehavior.constrained,
       children: <Widget>[
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => {
+            Navigator.of(context).pop()
+          },
           child: Text(
             'CANCEL',
             style: TextStyle(
@@ -26,6 +52,7 @@ class ButtonBarFieldWidget extends StatelessWidget {
         ),
         TextButton(
           onPressed: () {
+            toggleReminder(widget.noteReminder!.remindedAt);
             Navigator.of(context).pop();
           },
           child: Text(
@@ -39,5 +66,6 @@ class ButtonBarFieldWidget extends StatelessWidget {
         ),
       ],
     );
+  ;
   }
 }

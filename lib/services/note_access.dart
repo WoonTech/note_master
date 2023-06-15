@@ -68,7 +68,7 @@ Future postNoteReminderAsync(int noteId, NoteReminder noteReminder) async {
       await txn.insert('NoteReminder', {
         'NoteID': noteId,
         'ReminderAt': noteReminder.remindedAt.toIso8601String(),
-        'Repetition': noteReminder.repetition,
+        'Repetition': noteReminder.repetitionId,
         'NotificationText': noteReminder.notificationText
       });
     });
@@ -195,7 +195,7 @@ Future<NoteHeader> patchNoteAsync(NoteHeader note) async {
           'NoteReminder',
           {
             'ReminderAt': note.noteReminder?.remindedAt.toIso8601String(),
-            'Repetition': note.noteReminder?.repetition,
+            'Repetition': note.noteReminder?.repetitionId,
             'NotificationText': note.noteReminder?.notificationText
           },
           where: 'NoteID = ?',

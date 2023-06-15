@@ -13,46 +13,70 @@ import '../components/reminder.dart';
 import '../constants/status.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class NotePage extends StatefulWidget {
-  NoteHeader? currentNote;
+import '../models/repetition.dart';
+import '../services/repetition_access.dart';
 
-  NotePage({this.currentNote, super.key});
+class NotePage extends StatefulWidget {
+  NoteHeader? cardNote;
+
+  NotePage({this.cardNote, super.key});
 
   @override
   State<NotePage> createState() => _NotePageState();
+
 }
 
 class _NotePageState extends State<NotePage> {
-  bool isNotePinned = false;
   bool isReminderSet = false;
   DateTime createdAt = DateTime.now();
-  late String contentTitle;
-  late DateTime updatedAt;
-  DateTime? reminderAt;
-  int repetition = 0;
-  String notificationText = '';
-  late String status;
-  String categoryId = category_default;
+  List<NoteRepetition> repetitions = [];
   TextEditingController contentTextEditingController = TextEditingController();
   TextEditingController titleTextEditingController = TextEditingController();
   @override
   void initState() {
     super.initState();
-    if (widget.currentNote != null) {
-      isNotePinned = widget.currentNote!.isPinned;
-      contentTitle = widget.currentNote!.title;
-      createdAt = widget.currentNote!.createdAt;
-      status = widget.currentNote!.status;
-      categoryId = widget.currentNote!.category;
-      titleTextEditingController.text = widget.currentNote!.title;
+    currentNote = null;
+    createdAt = DateTime.now();
+    initializeCurrentNote();
+  }
+
+  Future<void> initializeCurrentNote() async{
+    repetitions = await getRepetitionsAsync();
+    if (widget.cardNote != null) {
+      currentNote = widget.cardNote;
+      isReminderSet = isReminderOver(widget.cardNote!.noteReminder!.remindedAt);
+      titleTextEditingController.text = widget.cardNote!.title;
       contentTextEditingController.text =
-          widget.currentNote!.noteDetail!.content;
+          widget.cardNote!.noteDetail!.content;
     }
+    else{
+      currentNote = NoteHeader(
+        createdAt: createdAt, 
+        updatedAt: createdAt, 
+        title: '');
+      currentNote!.noteDetail = NoteDetail(content: "");
+      currentNote!.noteReminder = NoteReminder(
+        remindedAt: minReminderAt, 
+        repetitionId: repetitions.first.id!, 
+        notificationText: ""
+      );
+      setState(() {
+        currentNote;
+      });
+    }
+  }
+  
+  Future<void> GetRepetitions() async {
+    List<NoteRepetition> data =
+        (await getRepetitionsAsync()).toList();
+    setState(() {
+      repetitions = data;
+    });
   }
 
   void togglePinned() {
     setState(() {
-      isNotePinned = !isNotePinned;
+      currentNote!.isPinned = !currentNote!.isPinned;
     });
   }
 
@@ -62,6 +86,9 @@ class _NotePageState extends State<NotePage> {
         isReminderSet = !isReminderSet;
       });
     }
+  }
+  bool isReminderOver(DateTime? reminderTime){
+    return reminderTime!.difference(createdAt) > Duration.zero;
   }
 
   String updateTitle(String title) {
@@ -76,18 +103,18 @@ class _NotePageState extends State<NotePage> {
 
   NoteHeader ToNote() {
     var noteHeader = NoteHeader(
-        id: widget.currentNote != null ? widget.currentNote!.id : null,
+        id: currentNote?.id,
         createdAt: createdAt,
-        updatedAt: updatedAt,
+        updatedAt: DateTime.now(),
         title: titleTextEditingController.text,
-        isPinned: isNotePinned,
-        status: activeStatus,
-        category: categoryId);
+        isPinned: currentNote!.isPinned,
+        status: currentNote?.status ?? activeStatus,
+        category: currentNote?.category ?? category_default);
     var noteDetail = NoteDetail(content: contentTextEditingController.text);
     var noteReminder = NoteReminder(
-        remindedAt: reminderAt ?? DateTime.utc(1999, 1, 1),
-        repetition: repetition,
-        notificationText: notificationText);
+        remindedAt: currentNote?.noteReminder?.remindedAt ?? DateTime.utc(1999, 1, 1),
+        repetitionId: currentNote?.noteReminder?.repetitionId ?? repetitions.first.id!,
+        notificationText: currentNote?.noteReminder?.notificationText ?? '');
     noteHeader.noteReminder = noteReminder;
     noteHeader.noteDetail = noteDetail;
     return noteHeader;
@@ -136,7 +163,7 @@ class _NotePageState extends State<NotePage> {
                   },
                   icon: Icon(
                     Icons.star,
-                    color: isNotePinned
+                    color: currentNote!.isPinned
                         ? const Color.fromRGBO(252, 196, 25, 1)
                         : NotepadIcon_Color,
                   )),
@@ -153,7 +180,7 @@ class _NotePageState extends State<NotePage> {
                   },
                   icon: Icon(
                     Icons.notifications,
-                    color: isReminderSet
+                    color: isReminderOver(currentNote!.noteReminder!.remindedAt)
                         ? const Color.fromRGBO(37, 87, 218, 1)
                         : NotepadIcon_Color,
                   )),
@@ -162,19 +189,18 @@ class _NotePageState extends State<NotePage> {
               margin: const EdgeInsets.only(right: 20),
               child: IconButton(
                   onPressed: () {
-                    updatedAt = DateTime.now();
                     var titleText = titleTextEditingController.text;
                     if (titleText.isEmpty) {
                       titleTextEditingController.text =
                           updateTitle(contentTextEditingController.text);
                     }
-                    widget.currentNote = ToNote();
-                    saveNoteAsync(widget.currentNote!)
-                        .then((value) => widget.currentNote = value)
+                    widget.cardNote = ToNote();
+                    saveNoteAsync(widget.cardNote!)
+                        .then((value) => widget.cardNote = value)
                         .whenComplete(() {
                       setState(() {
                         Provider.of<LayoutDataProvider>(context, listen: false)
-                            .addLatestNoteToList(widget.currentNote!);
+                            .addLatestNoteToList(widget.cardNote!);
                       });
                       FocusScope.of(context).requestFocus(FocusNode());
                       Fluttertoast.showToast(msg: "Note saved successfully!");
@@ -223,7 +249,7 @@ class _NotePageState extends State<NotePage> {
                         height: 15,
                       ),
                       Text(
-                        formattedDate.format(createdAt),
+                        formattedDate.format(currentNote!.createdAt),
                         style: TextStyle(
                             fontFamily: Font_Family_LATO,
                             fontSize: Font_Size_DIALOG,
@@ -243,7 +269,10 @@ class _NotePageState extends State<NotePage> {
                       ),
                     ],
                   ),
-                ))));
+                )
+              )
+            )
+          );
   }
 }
 

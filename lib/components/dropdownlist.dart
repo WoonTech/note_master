@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:note_master/components/reminder.dart';
+import 'package:note_master/models/layout.dart';
+import 'package:note_master/models/repetition.dart';
+import 'package:path/path.dart';
 
 import '../models/styling.dart';
 
 class DropDownFieldWidget extends StatelessWidget {
-  final List<String> dropdownValue;
-  const DropDownFieldWidget({required this.dropdownValue, super.key});
+  final List<NoteRepetition> repetitions;
+  const DropDownFieldWidget({required this.repetitions, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +27,7 @@ class DropDownFieldWidget extends StatelessWidget {
                 )),
             Expanded(
               child: DropDownListWidget(
-                dropdownValue: dropdownValue,
+                repetitions: repetitions,
               ),
             ),
           ],
@@ -32,17 +36,25 @@ class DropDownFieldWidget extends StatelessWidget {
 }
 
 class DropDownListWidget extends StatefulWidget {
-  final List<String> dropdownValue;
-  const DropDownListWidget({required this.dropdownValue, super.key});
+  final List<NoteRepetition> repetitions;
+  const DropDownListWidget({required this.repetitions, super.key});
 
   @override
   State<DropDownListWidget> createState() => _DropDownListWidgetState();
 }
 
 class _DropDownListWidgetState extends State<DropDownListWidget> {
+
+  String selectedValue = '';
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    selectedValue = widget.repetitions.where((element) => element.id == currentNote!.noteReminder!.repetitionId).first.repetitionText;
+  }
+
   @override
   Widget build(BuildContext context) {
-    String selectedValue = widget.dropdownValue.first;
     return Container(
         decoration:
             BoxDecoration(border: Border.all(color: Colors.transparent)),
@@ -50,14 +62,15 @@ class _DropDownListWidgetState extends State<DropDownListWidget> {
           value: selectedValue,
           borderRadius: BorderRadius.circular(10),
           dropdownColor: Color.fromRGBO(246, 250, 252, 1),
-          onChanged: (newValue) {
+          onChanged: (newIndex) {
             setState(() {
-              selectedValue = newValue!;
+              selectedValue = newIndex!;
+              tmpNoteReminder.repetitionId = widget.repetitions.firstWhere((repetition) => repetition.repetitionText == newIndex).id!;
             });
           },
           underline: Container(),
-          items: widget.dropdownValue.map((value) {
-            return DropdownMenuItem(value: value, child: Text(value));
+          items: widget.repetitions.map((repetition) {
+            return DropdownMenuItem(value: repetition.repetitionText, child: Text(repetition.repetitionText));
           }).toList(),
         ));
   }

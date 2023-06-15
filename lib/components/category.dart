@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:note_master/components/buttonbar.dart';
 import 'package:note_master/components/dropdownlist.dart';
+import 'package:note_master/models/layout.dart';
 
+import '../models/repetition.dart';
 import '../models/styling.dart';
-
-List<String> reminderDropDownList = [
-  'default',
-  'green',
-  'weekly',
-  'monthly',
-  'yearly'
-];
+import '../services/repetition_access.dart';
 
 class CategoryAlertBoxWidget extends StatefulWidget {
   const CategoryAlertBoxWidget({super.key});
@@ -20,6 +15,22 @@ class CategoryAlertBoxWidget extends StatefulWidget {
 }
 
 class _CategoryAlertBoxWidgetState extends State<CategoryAlertBoxWidget> {
+  List<NoteRepetition> repetitions = [];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    GetRepetitions();
+  }
+
+  Future<void> GetRepetitions() async {
+    List<NoteRepetition> data =
+        (await getRepetitionsAsync()).toList();
+    setState(() {
+      repetitions = data;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -43,7 +54,7 @@ class _CategoryAlertBoxWidgetState extends State<CategoryAlertBoxWidget> {
         mainAxisSize: MainAxisSize.min,
         children: [
           DropDownFieldWidget(
-            dropdownValue: reminderDropDownList,
+            repetitions: repetitions,
           ),
           const SizedBox(
             height: 5,
@@ -51,7 +62,7 @@ class _CategoryAlertBoxWidgetState extends State<CategoryAlertBoxWidget> {
           const CategoryTextFieldWidget(),
         ],
       ),
-      actions: const [ButtonBarFieldWidget()],
+      actions: [ButtonBarWidget()],
     );
   }
 }

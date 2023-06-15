@@ -5,7 +5,7 @@ import 'package:sqflite/sqflite.dart';
 import '../utils/data_access.dart';
 import '../models/category.dart';
 
-Future postCategoryAsync(NMCategory category) async {
+Future postCategoryAsync(NoteCategory category) async {
   var db = (await database);
   try {
     return await db.transaction((txn) async {
@@ -30,7 +30,7 @@ Future postCategoryAsync(NMCategory category) async {
   return categories;
 }*/
 
-Future<List<NMCategory>> getCategoriesAsync() async{
+Future<List<NoteCategory>> getCategoriesAsync() async{
   String getCategoriesQuery = 'Select * from Category'; 
   var db = (await database);
   var results = await db.rawQuery(getCategoriesQuery);
@@ -38,14 +38,14 @@ Future<List<NMCategory>> getCategoriesAsync() async{
   {
     return List.generate(results.length, (index)
     {
-      return NMCategory.fromJson(results[index]);
+      return NoteCategory.fromJson(results[index]);
     });
   } catch(ex) {
     throw Exception(ex);
   }
 }
 
-Future patchCategoryAsync(NMCategory category) async{
+Future patchCategoryAsync(NoteCategory category) async{
   DateTime updatedAt = DateTime.now();
   var db = (await database);
   try{
@@ -65,7 +65,7 @@ Future patchCategoryAsync(NMCategory category) async{
   }
 }
 
-Future deleteCategoryAsync(NMCategory category) async{
+Future deleteCategoryAsync(NoteCategory category) async{
   DateTime updatedAt = DateTime.now();
   var db = (await database);
   try{

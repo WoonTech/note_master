@@ -18,8 +18,8 @@ Color Theme_Color_SYSTEM = const Color.fromRGBO(37, 87, 218, 1);
 //Parameter
 int Category = 0;
 HashMap<int, NoteHeader> notes = HashMap();
-List<NMCategory> categories = [];
-DateTime? reminderAt;
+List<NoteCategory> categories = [];
+NoteHeader? currentNote;
 
 class BackgroundTheme {
   Color Theme_Color_ROOT;

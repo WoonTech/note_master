@@ -1,15 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:note_master/models/repetition.dart';
 import 'package:note_master/pages/checklistpage.dart';
 import 'package:note_master/pages/homepage.dart';
-import 'package:note_master/models/category.dart';
 import 'package:note_master/pages/notepage.dart';
 import 'package:note_master/services/category_access.dart';
 import 'package:note_master/utils/data_access.dart';
 import 'package:provider/provider.dart';
 import 'constants/status.dart';
+import 'models/category.dart';
 import 'models/layout.dart';
 import 'models/styling.dart';
+import 'services/repetition_access.dart';
 
 int _current = 0;
 String _selectText = 'reminder: 5 days';
@@ -55,13 +57,13 @@ class _MyAppState extends State<MyApp> {
     var categories = await getCategoriesAsync();
     if (categories.isEmpty) {
       var currentTime = DateTime.now();
-      var nmNoteCategory = NMCategory(
+      var nmNoteCategory = NoteCategory(
           createdAt: currentTime,
           updatedAt: currentTime,
           name: category_default,
           status: activeStatus,
           type: note_type);
-      var nmChecklistCategory = NMCategory(
+      var nmChecklistCategory = NoteCategory(
           createdAt: currentTime,
           updatedAt: currentTime,
           name: category_default,
@@ -69,6 +71,17 @@ class _MyAppState extends State<MyApp> {
           type: checklist_type);
       await postCategoryAsync(nmNoteCategory);
       await postCategoryAsync(nmChecklistCategory);
+    }
+    var repetitions = await getRepetitionsAsync();
+    if (repetitions.isEmpty){
+      List<NoteRepetition> repetitionList = [
+        NoteRepetition(repetitionText: 'only once'),
+        NoteRepetition(repetitionText: 'daily'),
+        NoteRepetition(repetitionText: 'weekly'),
+        NoteRepetition(repetitionText: 'monthly'),
+        NoteRepetition(repetitionText: 'yearly'),
+      ];
+      await postRepetitionsAsync(repetitionList);
     }
   }
 }

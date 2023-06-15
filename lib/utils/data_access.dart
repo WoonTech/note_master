@@ -32,18 +32,21 @@ class SQLDataAccess {
     String createNoteDetailQuery = getCreateNoteDetailQuery();
     String createCategoryQuery = getCreateCategoryQuery();
     String createNoteReminderQuery = getCreateNoteReminderQuery();
+    String createReminderRepetitionQuery = getCreateReminderRepetitionQuery();
     var db = await openDatabase(
       path,
       version: 1,
       onCreate: (db, version) async {
-        return await db.transaction((txn) async {
+        await db.transaction((txn) async {
           await txn.execute(createNoteHeaderQuery);
           await txn.execute(createNoteDetailQuery);
           await txn.execute(createCategoryQuery);
           await txn.execute(createNoteReminderQuery);
+          await txn.execute(createReminderRepetitionQuery);
         });
       },
     );
+    //await db.execute(createReminderRepetitionQuery);
     //cleanNoteTable(db);
     return db;
   }
@@ -94,6 +97,15 @@ class SQLDataAccess {
         ReminderAt TEXT,
         Repetition TEXT,
         NotificationText TEXT
+      )
+    ''';
+  }
+
+    String getCreateReminderRepetitionQuery() {
+    return '''
+      CREATE TABLE ReminderRepetition (
+        ID INTEGER PRIMARY KEY AUTOINCREMENT,
+        RepetitionText TEXT
       )
     ''';
   }

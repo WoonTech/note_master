@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> GetCategories() async {
-    List<NMCategory> data =
+    List<NoteCategory> data =
         (await getCategoriesAsync()).where((c) => c.type == note_type).toList();
     setState(() {
       categories = data;
@@ -77,7 +77,7 @@ class _HomePageState extends State<HomePage> {
 
 class BodyWidget extends StatefulWidget {
   final LayoutDataProvider currentTheme;
-  final List<NMCategory> categories;
+  final List<NoteCategory> categories;
   const BodyWidget(
       {required this.currentTheme, required this.categories, super.key});
 
@@ -230,7 +230,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) => NotePage(
-                                                  currentNote: notes.values
+                                                  cardNote: notes.values
                                                       .elementAt(index))));
                                     },
                                     child: CardWidget(

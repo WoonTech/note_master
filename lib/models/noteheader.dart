@@ -1,4 +1,5 @@
 import 'package:note_master/constants/status.dart';
+import 'package:note_master/models/category.dart';
 import 'package:note_master/models/notedetail.dart';
 import 'package:note_master/models/notereminder.dart';
 
@@ -20,7 +21,7 @@ class NoteHeader {
       required this.title,
       this.isPinned = false,
       this.status = activeStatus,
-      required this.category});
+      this.category = category_default});
 
   factory NoteHeader.fromJson(Map<String, dynamic> json) {
     var noteHeader = NoteHeader(
@@ -39,7 +40,7 @@ class NoteHeader {
           id: json['ReminderID'],
           noteId: json['ID'],
           remindedAt: DateTime.parse(json['RemindedAt']),
-          repetition: json['Repetition'],
+          repetitionId: json['Repetition'],
           notificationText: json['NotificationText']);
     }
     return noteHeader;

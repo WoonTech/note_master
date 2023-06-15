@@ -4,7 +4,7 @@ const String category_default = 'All';
 const String note_type = 'note';
 const String checklist_type = 'checklist';
 
-class NMCategory {
+class NoteCategory {
   int? id;
   DateTime createdAt;
   DateTime updatedAt;
@@ -12,7 +12,7 @@ class NMCategory {
   String? status = activeStatus;
   String? type = "";
 
-  NMCategory(
+  NoteCategory(
       {this.id,
       required this.createdAt,
       required this.updatedAt,
@@ -20,8 +20,8 @@ class NMCategory {
       required this.status,
       required this.type});
 
-  factory NMCategory.fromJson(Map<String, dynamic> json) {
-    return NMCategory(
+  factory NoteCategory.fromJson(Map<String, dynamic> json) {
+    return NoteCategory(
         id: json['ID'],
         createdAt: DateTime.parse(json['CreatedAt']).toLocal(),
         updatedAt: DateTime.parse(json['UpdatedAt']).toLocal(),

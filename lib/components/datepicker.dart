@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:note_master/components/reminder.dart';
 import 'package:note_master/models/layout.dart';
 import 'package:intl/intl.dart';
+import 'package:note_master/models/notereminder.dart';
 import '../models/styling.dart';
 
 class DateTimeFieldWidget extends StatefulWidget {
@@ -13,8 +15,12 @@ class DateTimeFieldWidget extends StatefulWidget {
 class _DateTimeFieldWidgetState extends State<DateTimeFieldWidget> {
   void SetReminder(DateTime? dateTime) {
     setState(() {
-      reminderAt = dateTime;
+      tmpNoteReminder.remindedAt = minReminderAt;
     });
+  }
+
+  bool isReminderOver(DateTime? reminderTime){
+    return reminderTime!.difference(DateTime.now()) > Duration.zero;
   }
 
   @override
@@ -47,9 +53,9 @@ class _DateTimeFieldWidgetState extends State<DateTimeFieldWidget> {
                   ).then((value) => SetReminder(value));
                 },
                 child: Text(
-                  reminderAt == null
+                  isReminderOver(currentNote!.noteReminder!.remindedAt)
                       ? "none"
-                      : formattedDate.format(reminderAt!),
+                      : formattedDate.format(currentNote!.noteReminder!.remindedAt),
                   style: TextStyle(
                       fontFamily: Font_Family_LATO,
                       fontSize: Font_Size_DIALOG,

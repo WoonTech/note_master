@@ -3,21 +3,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:note_master/models/layout.dart';
 import 'package:note_master/models/notereminder.dart';
+import 'package:note_master/models/repetition.dart';
+import 'package:note_master/services/repetition_access.dart';
 
 import '../models/styling.dart';
 import 'buttonbar.dart';
 import 'datepicker.dart';
 import 'dropdownlist.dart';
 
-List<String> reminderDropDownList = [
-  'only once',
-  'daily',
-  'weekly',
-  'monthly',
-  'yearly'
-];
-
+late NoteReminder tmpNoteReminder;
 class NotificationWidget extends StatefulWidget {
   final NoteReminder noteReminder;
   const NotificationWidget({required this.noteReminder, super.key});
@@ -27,6 +23,7 @@ class NotificationWidget extends StatefulWidget {
 }
 
 class _NotificationWidgetState extends State<NotificationWidget> {
+
   @override
   Widget build(BuildContext context) {
     var reminderAt = widget.noteReminder.remindedAt.difference(DateTime.now());
@@ -49,7 +46,26 @@ class ReminderAlertBoxWidget extends StatefulWidget {
 }
 
 class _ReminderAlertBoxWidgetState extends State<ReminderAlertBoxWidget> {
-  DateTime? currentReminder;
+  List<NoteRepetition> repetitions = [];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    InitializeReminder();
+  }
+  
+  Future<void> InitializeReminder() async {
+    List<NoteRepetition> data =
+        (await getRepetitionsAsync()).toList();
+    setState(() {
+      repetitions = data;
+      tmpNoteReminder = NoteReminder(
+        remindedAt: minReminderAt, 
+        repetitionId: repetitions.first.id!, 
+        notificationText: '');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -77,7 +93,7 @@ class _ReminderAlertBoxWidgetState extends State<ReminderAlertBoxWidget> {
             height: 5,
           ),
           DropDownFieldWidget(
-            dropdownValue: reminderDropDownList,
+            repetitions: repetitions,
           ),
           const SizedBox(
             height: 5,
@@ -85,45 +101,57 @@ class _ReminderAlertBoxWidgetState extends State<ReminderAlertBoxWidget> {
           const ReminderTextFieldWidget(),
         ],
       ),
-      actions: const [ButtonBarFieldWidget()],
+      actions: [ButtonBarWidget(noteReminder: tmpNoteReminder)],
     );
   }
 }
 
-class ReminderTextFieldWidget extends StatelessWidget {
+class ReminderTextFieldWidget extends StatefulWidget {
   const ReminderTextFieldWidget({super.key});
 
   @override
+  State<ReminderTextFieldWidget> createState() => _ReminderTextFieldWidgetState();
+}
+
+class _ReminderTextFieldWidgetState extends State<ReminderTextFieldWidget> {
+ @override
   Widget build(BuildContext context) {
     return Container(
-        height: 34,
-        decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(15)),
-            color: Color.fromRGBO(245, 245, 245, 1)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-                padding: const EdgeInsets.only(left: 10, right: 5),
-                child: const Icon(
-                  Icons.edit_note,
-                  color: Colors.black,
-                  size: 20,
-                )),
-            Expanded(
-              child: TextField(
-                decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.only(right: 15, bottom: 15),
-                    hintText: 'Notification text',
-                    border: InputBorder.none),
-                //focusNode: _focusNode,
-                style: TextStyle(
-                  fontSize: Font_Size_DIALOG,
-                  fontFamily: Font_Family_LATO,
-                ),
+      height: 34,
+      decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(15)),
+          color: Color.fromRGBO(245, 245, 245, 1)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+              padding: const EdgeInsets.only(left: 10, right: 5),
+              child: const Icon(
+                Icons.edit_note,
+                color: Colors.black,
+                size: 20,
+              )),
+          Expanded(
+            child: TextField(
+              onChanged: (value){
+                setState(() {
+                  tmpNoteReminder.notificationText = value;
+                });
+              },
+              decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.only(right: 15, bottom: 15),
+                  hintText: 'Notification text',
+                  border: InputBorder.none),
+              //focusNode: _focusNode,
+              controller: TextEditingController(text: currentNote!.noteReminder!.notificationText),
+              style: TextStyle(
+                fontSize: Font_Size_DIALOG,
+                fontFamily: Font_Family_LATO,
               ),
             ),
-          ],
-        ));
+          ),
+        ],
+      )
+    );
   }
 }
