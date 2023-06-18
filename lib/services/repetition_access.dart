@@ -1,25 +1,23 @@
 import 'package:note_master/models/repetition.dart';
 
-import '../utils/data_access.dart';
+import '../utils/dataAccess.dart';
 
-Future<List<NoteRepetition>> getRepetitionsAsync() async{
-  String getRepetitionsQuery = 'Select * from ReminderRepetition'; 
+Future<List<NoteRepetition>> getRepetitionsAsync() async {
+  String getRepetitionsQuery = 'Select * from ReminderRepetition';
   var db = (await database);
   var results = await db.rawQuery(getRepetitionsQuery);
-  try
-  {
-    return List.generate(results.length, (index)
-    {
+  try {
+    return List.generate(results.length, (index) {
       return NoteRepetition.fromJson(results[index]);
     });
-  } catch(ex) {
+  } catch (ex) {
     throw Exception(ex);
   }
 }
 
 Future postRepetitionsAsync(List<NoteRepetition> repetitions) async {
   var db = (await database);
-  for(var repetition in repetitions){
+  for (var repetition in repetitions) {
     try {
       await db.transaction((txn) async {
         await txn.insert('ReminderRepetition', {
@@ -30,5 +28,4 @@ Future postRepetitionsAsync(List<NoteRepetition> repetitions) async {
       throw Exception(e);
     }
   }
-
 }

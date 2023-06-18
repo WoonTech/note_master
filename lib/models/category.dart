@@ -11,14 +11,15 @@ class NoteCategory {
   String name;
   String? status = activeStatus;
   String? type = "";
-
+  int colorId;
   NoteCategory(
       {this.id,
       required this.createdAt,
       required this.updatedAt,
       required this.name,
       required this.status,
-      required this.type});
+      required this.type,
+      required this.colorId});
 
   factory NoteCategory.fromJson(Map<String, dynamic> json) {
     return NoteCategory(
@@ -27,6 +28,7 @@ class NoteCategory {
         updatedAt: DateTime.parse(json['UpdatedAt']).toLocal(),
         name: json['CategoryName'],
         status: json['Status'],
-        type: json['Type']);
+        type: json['Type'],
+        colorId: int.parse(json['ColorID']));
   }
 }

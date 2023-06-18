@@ -46,8 +46,10 @@ class SQLDataAccess {
         });
       },
     );
-    //await db.execute(createReminderRepetitionQuery);
+    //await db.execute(createCategoryQuery);
+    //addColumnToTable(db);
     //cleanNoteTable(db);
+    //cleanCategoryTable(db);
     return db;
   }
 
@@ -77,14 +79,15 @@ class SQLDataAccess {
 
   String getCreateCategoryQuery() {
     return '''
-      CREATE TABLE Category (
+      CREATE TABLE NoteCategory (
         ID INTEGER PRIMARY KEY AUTOINCREMENT,
         NoteID TEXT,
         CreatedAt TEXT,
         UpdatedAt TEXT,
         CategoryName TEXT,
         Status TEXT,
-        Type TEXT
+        Type TEXT,
+        ColorID TEXT
       )
       ''';
   }
@@ -94,14 +97,14 @@ class SQLDataAccess {
       CREATE TABLE NoteReminder (
         ID INTEGER PRIMARY KEY AUTOINCREMENT,
         NoteID TEXT,
-        ReminderAt TEXT,
+        RemindedAt TEXT,
         Repetition TEXT,
         NotificationText TEXT
       )
     ''';
   }
 
-    String getCreateReminderRepetitionQuery() {
+  String getCreateReminderRepetitionQuery() {
     return '''
       CREATE TABLE ReminderRepetition (
         ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -127,8 +130,16 @@ class SQLDataAccess {
   await database.execute('ALTER TABLE NoteReminder ADD COLUMN NoteID TEXT');
 }*/
 
+void addColumnToTable(Database database) async {
+  await database.execute('ALTER TABLE NoteReminder ADD COLUMN RemindedAt TEXT');
+}
+
 void cleanNoteTable(Database database) async {
   await database.execute('Delete From NoteHeader');
   await database.execute('Delete From NoteDetail');
   await database.execute('Delete From NoteReminder');
+}
+
+void cleanCategoryTable(Database db) async {
+  await db.execute("Delete From Category");
 }

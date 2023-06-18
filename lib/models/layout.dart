@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:note_master/models/noteheader.dart';
+import 'package:note_master/models/repetition.dart';
 import 'package:note_master/services/category_access.dart';
 import 'package:note_master/services/note_access.dart';
 
@@ -18,7 +19,8 @@ Color Theme_Color_SYSTEM = const Color.fromRGBO(37, 87, 218, 1);
 //Parameter
 int Category = 0;
 HashMap<int, NoteHeader> notes = HashMap();
-List<NoteCategory> categories = [];
+List<NoteCategory> noteCategories = [];
+List<NoteRepetition> noteRepetitions = [];
 NoteHeader? currentNote;
 
 class BackgroundTheme {
@@ -89,17 +91,17 @@ class LayoutDataProvider extends ChangeNotifier {
   }
 
   Future<void> getNoteCategories() async {
-    categories =
+    noteCategories =
         (await getCategoriesAsync()).where((c) => c.type == note_type).toList();
     notifyListeners();
   }
 
-  Future<void> getCheckListCategories() async {
+  /*Future<void> getCheckListCategories() async {
     categories = (await getCategoriesAsync())
         .where((c) => c.type == checklist_type)
         .toList();
     notifyListeners();
-  }
+  }*/
 
   Future<void> getNote() async {
     var cacheNotes = await getNotesAsync();

@@ -5,7 +5,7 @@ import 'package:note_master/pages/checklistpage.dart';
 import 'package:note_master/pages/homepage.dart';
 import 'package:note_master/pages/notepage.dart';
 import 'package:note_master/services/category_access.dart';
-import 'package:note_master/utils/data_access.dart';
+import 'package:note_master/utils/dataAccess.dart';
 import 'package:provider/provider.dart';
 import 'constants/status.dart';
 import 'models/category.dart';
@@ -19,41 +19,64 @@ String _selectText = 'reminder: 5 days';
 List<String> dropdownList = ['Notes', 'reminder: 10 days', 'reminder: 20 days'];
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
+class MyApp extends StatelessWidget {
   ThemeData theme = appThemeLight;
-  @override
-  void initState() {
-    super.initState();
-    SQLDataAccess().initialiseDBAsync().whenComplete(() async {
-      await initialize();
-    });
-    //ensureDBExisted().then((value) => initialize());
-    //updateThemeFromSharedPref();
-  }
+
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: initializeData(),
+      builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          );
+        } else if (snapshot.hasError) {
+          return const MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: Text('Error occurred while initializing data'),
+              ),
+            ),
+          );
+        } else {
+          return MaterialApp(
+            home: Scaffold(
+                resizeToAvoidBottomInset: false,
+                body: ChangeNotifierProvider(
+                  create: (context) => LayoutDataProvider(),
+                  child: const MaterialApp(
+                    home: SwipeNavigation(),
+                  ),
+                )),
+          );
+        }
+      },
+    );
+  }
+
+  @override
+  /*Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => LayoutDataProvider(),
       child: const MaterialApp(
         home: SwipeNavigation(),
       ),
     );
-  }
+  }*/
 
   void updateThemeFromSharedPref() async {}
-  Future initialize() async {
-    //if category is empty, create all
+  Future initializeData() async {
+    await SQLDataAccess().initialiseDBAsync();
     var categories = await getCategoriesAsync();
     if (categories.isEmpty) {
       var currentTime = DateTime.now();
@@ -62,18 +85,29 @@ class _MyAppState extends State<MyApp> {
           updatedAt: currentTime,
           name: category_default,
           status: activeStatus,
-          type: note_type);
+          type: note_type,
+          colorId: 1);
       var nmChecklistCategory = NoteCategory(
           createdAt: currentTime,
           updatedAt: currentTime,
           name: category_default,
           status: activeStatus,
-          type: checklist_type);
+          type: checklist_type,
+          colorId: 1);
       await postCategoryAsync(nmNoteCategory);
       await postCategoryAsync(nmChecklistCategory);
+      categories = await getCategoriesAsync();
     }
+    categories.add(NoteCategory(
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        name: "Add New +",
+        status: activeStatus,
+        type: note_type,
+        colorId: 1));
+
     var repetitions = await getRepetitionsAsync();
-    if (repetitions.isEmpty){
+    if (repetitions.isEmpty) {
       List<NoteRepetition> repetitionList = [
         NoteRepetition(repetitionText: 'only once'),
         NoteRepetition(repetitionText: 'daily'),
@@ -82,7 +116,11 @@ class _MyAppState extends State<MyApp> {
         NoteRepetition(repetitionText: 'yearly'),
       ];
       await postRepetitionsAsync(repetitionList);
+      repetitions = await getRepetitionsAsync();
     }
+
+    noteRepetitions = repetitions;
+    noteCategories = categories;
   }
 }
 
@@ -149,14 +187,7 @@ class _SwipeNavigationState extends State<SwipeNavigation> {
         child: PageView(
           controller: _pageController,
           physics: NeverScrollableScrollPhysics(),
-          children: [
-            Container(
-              child: HomePage(),
-            ),
-            Container(
-              child: CheckListPage(),
-            ),
-          ],
+          children: [HomePage(), CheckListPage()],
         ),
       ),
     );

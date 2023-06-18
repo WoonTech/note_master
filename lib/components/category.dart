@@ -1,34 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:note_master/components/buttonbar.dart';
+import 'package:note_master/components/colorPalette.dart';
 import 'package:note_master/components/dropdownlist.dart';
+import 'package:note_master/constants/status.dart';
+import 'package:note_master/models/category.dart';
 import 'package:note_master/models/layout.dart';
 
 import '../models/repetition.dart';
 import '../models/styling.dart';
 import '../services/repetition_access.dart';
 
+late NoteCategory tmpNoteCategory;
+
 class CategoryAlertBoxWidget extends StatefulWidget {
-  const CategoryAlertBoxWidget({super.key});
+  String categoryType;
+  CategoryAlertBoxWidget({required this.categoryType, super.key});
 
   @override
   State<CategoryAlertBoxWidget> createState() => _CategoryAlertBoxWidgetState();
 }
 
 class _CategoryAlertBoxWidgetState extends State<CategoryAlertBoxWidget> {
-  List<NoteRepetition> repetitions = [];
+  TextEditingController controller = TextEditingController();
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    GetRepetitions();
+    InitializeCategory();
   }
 
-  Future<void> GetRepetitions() async {
-    List<NoteRepetition> data =
-        (await getRepetitionsAsync()).toList();
-    setState(() {
-      repetitions = data;
-    });
+  Future<void> InitializeCategory() async {
+    tmpNoteCategory = NoteCategory(
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        name: "",
+        status: activeStatus,
+        type: widget.categoryType,
+        colorId: 1);
   }
 
   @override
@@ -39,30 +48,47 @@ class _CategoryAlertBoxWidgetState extends State<CategoryAlertBoxWidget> {
           Radius.circular(25.0),
         ),
       ),
-      titlePadding: const EdgeInsets.only(left: 50, top: 20),
-      title: Text(
-        'Add New Category',
-        style: TextStyle(
-            color: Font_Color_Default,
-            fontFamily: Font_Family_LATO,
-            fontSize: Font_Size_HEADER,
-            fontWeight: FontWeight.w500),
-      ),
       contentPadding: const EdgeInsets.only(left: 20, right: 20, top: 20),
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          DropDownFieldWidget(
-            repetitions: repetitions,
+          TextField(
+            onChanged: (value) {
+              tmpNoteCategory.name = controller.text;
+            },
+            controller: controller,
+            autofocus: true,
+            decoration: InputDecoration.collapsed(
+              hintText: 'New category name',
+              hintStyle: TextStyle(
+                  color: Font_Color_DETAILS,
+                  fontFamily: Font_Family_LATO,
+                  fontSize: Font_Size_HEADER,
+                  fontWeight: FontWeight.w500),
+              border: InputBorder.none,
+            ),
+            style: TextStyle(
+                fontFamily: Font_Family_LATO,
+                fontSize: Font_Size_HEADER,
+                fontWeight: FontWeight.w500),
+            textAlign: TextAlign.left,
           ),
           const SizedBox(
-            height: 5,
+            height: 15,
           ),
-          const CategoryTextFieldWidget(),
+          ColorPaletteWidget(),
+          /*const SizedBox(
+            height: 10,
+          ),
+          const CategoryTextFieldWidget(),*/
         ],
       ),
-      actions: [ButtonBarWidget()],
+      actions: [
+        ButtonBarWidget(
+          noteCategory: tmpNoteCategory,
+        )
+      ],
     );
   }
 }

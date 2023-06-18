@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:note_master/components/category.dart';
+import 'package:note_master/constants/status.dart';
 import 'package:note_master/services/category_access.dart';
 import 'package:provider/provider.dart';
 
@@ -8,7 +10,7 @@ import '../models/layout.dart';
 import '../models/noteheader.dart';
 import '../models/styling.dart';
 import '../services/note_access.dart';
-import '../utils/data_access.dart';
+import '../utils/dataAccess.dart';
 import 'notepage.dart';
 
 int _current = 0;
@@ -22,21 +24,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  //List<NMCategory> categories = [];
   @override
   void initState() {
     super.initState();
-    GetCategories();
-    //Provider.of<CurrentTheme>(context, listen: false).setThemeStyle(0);
     _current = 0;
-  }
-
-  Future<void> GetCategories() async {
-    List<NoteCategory> data =
-        (await getCategoriesAsync()).where((c) => c.type == note_type).toList();
-    setState(() {
-      categories = data;
-    });
   }
 
   @override
@@ -54,7 +45,10 @@ class _HomePageState extends State<HomePage> {
                       color: currentTheme.theme.Theme_Color_SUBDOMAIN,
                     ),
                     BodyWidget(
-                        currentTheme: currentTheme, categories: categories),
+                        currentTheme: currentTheme,
+                        categories: noteCategories
+                            .where((c) => c.type == note_type)
+                            .toList()),
                     const SearchBarWidget()
                   ],
                 )),
@@ -176,12 +170,28 @@ class _BodyWidgetState extends State<BodyWidget> {
                             itemBuilder: (context, index) {
                               return GestureDetector(
                                 onTap: () {
-                                  setState(() {
-                                    _current = index;
-                                    Provider.of<LayoutDataProvider>(context,
-                                            listen: false)
-                                        .setThemeStyle(index);
-                                  });
+                                  if (index ==
+                                      noteCategories
+                                              .where((element) =>
+                                                  element.type == note_type)
+                                              .length -
+                                          1) {
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return CategoryAlertBoxWidget(
+                                            categoryType: note_type,
+                                          );
+                                        });
+                                  } else {
+                                    setState(() {
+                                      _current = index;
+                                      if (_current == noteCategories.length) {}
+                                      Provider.of<LayoutDataProvider>(context,
+                                              listen: false)
+                                          .setThemeStyle(index);
+                                    });
+                                  }
                                 },
                                 child: Container(
                                   margin: const EdgeInsets.only(right: 10),
@@ -249,8 +259,20 @@ class _BodyWidgetState extends State<BodyWidget> {
   }
 }
 
-class SearchBarWidget extends StatelessWidget {
+class SearchBarWidget extends StatefulWidget {
   const SearchBarWidget({super.key});
+
+  @override
+  State<SearchBarWidget> createState() => _SearchBarWidgetState();
+}
+
+class _SearchBarWidgetState extends State<SearchBarWidget> {
+  TextEditingController controller = TextEditingController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -298,19 +320,24 @@ class SearchBarWidget extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Expanded(
-                                child: TextField(
-                                  decoration: InputDecoration(
+                                child: Focus(
+                                  autofocus: false,
+                                  child: TextField(
+                                    autofocus: false,
+                                    controller: controller,
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
                                       contentPadding: const EdgeInsets.only(
                                           left: 15, right: 15, bottom: 15),
                                       hintText: 'Search your note',
                                       hintStyle: TextStyle(
                                           color: Font_Color_TYPE,
                                           fontWeight: FontWeight.w500),
-                                      border: InputBorder.none),
-                                  //focusNode: _focusNode,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: 'Lato',
+                                    ),
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontFamily: 'Lato',
+                                    ),
                                   ),
                                 ),
                               ),

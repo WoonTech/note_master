@@ -23,13 +23,11 @@ class NotePage extends StatefulWidget {
 
   @override
   State<NotePage> createState() => _NotePageState();
-
 }
 
 class _NotePageState extends State<NotePage> {
   bool isReminderSet = false;
   DateTime createdAt = DateTime.now();
-  List<NoteRepetition> repetitions = [];
   TextEditingController contentTextEditingController = TextEditingController();
   TextEditingController titleTextEditingController = TextEditingController();
   @override
@@ -40,38 +38,24 @@ class _NotePageState extends State<NotePage> {
     initializeCurrentNote();
   }
 
-  Future<void> initializeCurrentNote() async{
-    repetitions = await getRepetitionsAsync();
+  void initializeCurrentNote() {
     if (widget.cardNote != null) {
       currentNote = widget.cardNote;
       isReminderSet = isReminderOver(widget.cardNote!.noteReminder!.remindedAt);
       titleTextEditingController.text = widget.cardNote!.title;
-      contentTextEditingController.text =
-          widget.cardNote!.noteDetail!.content;
-    }
-    else{
-      currentNote = NoteHeader(
-        createdAt: createdAt, 
-        updatedAt: createdAt, 
-        title: '');
+      contentTextEditingController.text = widget.cardNote!.noteDetail!.content;
+    } else {
+      currentNote =
+          NoteHeader(createdAt: createdAt, updatedAt: createdAt, title: '');
       currentNote!.noteDetail = NoteDetail(content: "");
       currentNote!.noteReminder = NoteReminder(
-        remindedAt: minReminderAt, 
-        repetitionId: repetitions.first.id!, 
-        notificationText: ""
-      );
+          remindedAt: minReminderAt,
+          repetitionId: noteRepetitions.first.id!,
+          notificationText: "");
       setState(() {
         currentNote;
       });
     }
-  }
-  
-  Future<void> GetRepetitions() async {
-    List<NoteRepetition> data =
-        (await getRepetitionsAsync()).toList();
-    setState(() {
-      repetitions = data;
-    });
   }
 
   void togglePinned() {
@@ -87,7 +71,8 @@ class _NotePageState extends State<NotePage> {
       });
     }
   }
-  bool isReminderOver(DateTime? reminderTime){
+
+  bool isReminderOver(DateTime? reminderTime) {
     return reminderTime!.difference(createdAt) > Duration.zero;
   }
 
@@ -112,8 +97,10 @@ class _NotePageState extends State<NotePage> {
         category: currentNote?.category ?? category_default);
     var noteDetail = NoteDetail(content: contentTextEditingController.text);
     var noteReminder = NoteReminder(
-        remindedAt: currentNote?.noteReminder?.remindedAt ?? DateTime.utc(1999, 1, 1),
-        repetitionId: currentNote?.noteReminder?.repetitionId ?? repetitions.first.id!,
+        remindedAt:
+            currentNote?.noteReminder?.remindedAt ?? DateTime.utc(1999, 1, 1),
+        repetitionId: currentNote?.noteReminder?.repetitionId ??
+            noteRepetitions.first.id!,
         notificationText: currentNote?.noteReminder?.notificationText ?? '');
     noteHeader.noteReminder = noteReminder;
     noteHeader.noteDetail = noteDetail;
@@ -146,7 +133,9 @@ class _NotePageState extends State<NotePage> {
                     showDialog(
                         context: context,
                         builder: (BuildContext context) {
-                          return const CategoryAlertBoxWidget();
+                          return CategoryAlertBoxWidget(
+                            categoryType: note_type,
+                          );
                         });
                   },
                   icon: Icon(
@@ -269,10 +258,7 @@ class _NotePageState extends State<NotePage> {
                       ),
                     ],
                   ),
-                )
-              )
-            )
-          );
+                ))));
   }
 }
 

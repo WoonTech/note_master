@@ -5,7 +5,7 @@ import 'package:sqflite/sqflite.dart';
 import '../models/category.dart';
 import '../models/notedetail.dart';
 import '../models/noteheader.dart';
-import '../utils/data_access.dart';
+import '../utils/dataAccess.dart';
 
 Future<NoteHeader> saveNoteAsync(NoteHeader noteHeader) async {
   if (noteHeader.id == null) {
@@ -67,7 +67,7 @@ Future postNoteReminderAsync(int noteId, NoteReminder noteReminder) async {
     await db.transaction((txn) async {
       await txn.insert('NoteReminder', {
         'NoteID': noteId,
-        'ReminderAt': noteReminder.remindedAt.toIso8601String(),
+        'RemindedAt': noteReminder.remindedAt.toIso8601String(),
         'Repetition': noteReminder.repetitionId,
         'NotificationText': noteReminder.notificationText
       });
@@ -83,14 +83,14 @@ Future<List<NoteHeader>> getNotesAsync(
       ? '''
   Select NoteHeader.*, 
   NoteDetail.ID as DetailID, NoteDetail.Content, 
-  NoteReminder.ID as ReminderID, NoteReminder.ReminderAt as ReminderAt, NoteReminder.Repetition as Repetition, NoteReminder.NotificationText as NotificationText from NoteHeader 
+  NoteReminder.ID as ReminderID, NoteReminder.RemindedAt as RemindedAt, NoteReminder.Repetition as RepetitionID, NoteReminder.NotificationText as NotificationText from NoteHeader 
   LEFT JOIN NoteDetail ON NoteHeader.ID = NoteDetail.NoteID
   LEFT JOIN NoteReminder ON NoteHeader.ID = NoteReminder.NoteID
   '''
       : '''
   Select NoteHeader.*,
   NoteDetail.ID as DetailID, NoteDetail.Content, 
-  NoteReminder.ID as ReminderID, NoteReminder.ReminderAt as ReminderAt, NoteReminder.Repetition as Repetition, NoteReminder.NotificationText as NotificationText from NoteHeader 
+  NoteReminder.ID as ReminderID, NoteReminder.RemindedAt as RemindedAt, NoteReminder.Repetition as RepetitionID, NoteReminder.NotificationText as NotificationText from NoteHeader 
   LEFT JOIN NoteDetail ON NoteHeader.ID = NoteDetail.NoteID
   LEFT JOIN NoteReminder ON NoteHeader.ID = NoteReminder.NoteID
   where NoteHeader.CategoryID = ?
@@ -194,7 +194,7 @@ Future<NoteHeader> patchNoteAsync(NoteHeader note) async {
       await txn.update(
           'NoteReminder',
           {
-            'ReminderAt': note.noteReminder?.remindedAt.toIso8601String(),
+            'RemindedAt': note.noteReminder?.remindedAt.toIso8601String(),
             'Repetition': note.noteReminder?.repetitionId,
             'NotificationText': note.noteReminder?.notificationText
           },

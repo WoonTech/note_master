@@ -34,13 +34,13 @@ class NoteHeader {
         category: json['CategoryID']);
     noteHeader.noteDetail = NoteDetail(
         id: json['DetailID'], noteId: json['ID'], content: json['Content']);
-    var notificationId = json['NoteReminder.ID'];
+    var notificationId = json['ReminderID'];
     if (notificationId != null) {
       noteHeader.noteReminder = NoteReminder(
           id: json['ReminderID'],
           noteId: json['ID'],
-          remindedAt: DateTime.parse(json['RemindedAt']),
-          repetitionId: json['Repetition'],
+          remindedAt: DateTime.parse(json['RemindedAt']).toLocal(),
+          repetitionId: int.parse(json['RepetitionID']),
           notificationText: json['NotificationText']);
     }
     return noteHeader;

@@ -1,34 +1,39 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:note_master/models/category.dart';
 import 'package:note_master/models/layout.dart';
+import 'package:note_master/services/category_access.dart';
 
 import '../models/notereminder.dart';
 import '../models/styling.dart';
 
 class ButtonBarWidget extends StatefulWidget {
   NoteReminder? noteReminder;
-  ButtonBarWidget({this.noteReminder, super.key});
+  NoteCategory? noteCategory;
+  ButtonBarWidget({this.noteReminder, this.noteCategory, super.key});
 
   @override
   State<ButtonBarWidget> createState() => _ButtonBarWidgetState();
 }
 
 class _ButtonBarWidgetState extends State<ButtonBarWidget> {
-
-  bool isReminderOver(DateTime? reminderTime){
+  bool isReminderOver(DateTime? reminderTime) {
     return reminderTime!.difference(DateTime.now()) > Duration.zero;
   }
 
   void toggleReminder(DateTime? reminderAt) {
     if (isReminderOver(reminderAt)) {
       setState(() {
-        currentNote!.noteReminder!.notificationText = widget.noteReminder!.notificationText;
+        currentNote!.noteReminder!.notificationText =
+            widget.noteReminder!.notificationText;
         currentNote!.noteReminder!.remindedAt = widget.noteReminder!.remindedAt;
-        currentNote!.noteReminder!.repetitionId = widget.noteReminder!.repetitionId;
+        currentNote!.noteReminder!.repetitionId =
+            widget.noteReminder!.repetitionId;
       });
     }
   }
-  void resetReminder(NoteReminder noteReminder){
-  }
+
+  void resetReminder(NoteReminder noteReminder) {}
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +43,7 @@ class _ButtonBarWidgetState extends State<ButtonBarWidget> {
       layoutBehavior: ButtonBarLayoutBehavior.constrained,
       children: <Widget>[
         TextButton(
-          onPressed: () => {
-            Navigator.of(context).pop()
-          },
+          onPressed: () => {Navigator.of(context).pop()},
           child: Text(
             'CANCEL',
             style: TextStyle(
@@ -52,7 +55,17 @@ class _ButtonBarWidgetState extends State<ButtonBarWidget> {
         ),
         TextButton(
           onPressed: () {
-            toggleReminder(widget.noteReminder!.remindedAt);
+            if (widget.noteReminder != null) {
+              toggleReminder(widget.noteReminder!.remindedAt);
+            }
+            if (widget.noteCategory != null) {
+              noteCategories.add(widget.noteCategory!);
+
+              /*postCategoryAsync(widget.noteCategory!)
+                  .whenComplete(() => setState(() {
+                        noteCategories.add(widget.noteCategory!);
+                      }));*/
+            }
             Navigator.of(context).pop();
           },
           child: Text(
@@ -66,6 +79,6 @@ class _ButtonBarWidgetState extends State<ButtonBarWidget> {
         ),
       ],
     );
-  ;
+    ;
   }
 }

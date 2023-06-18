@@ -15,12 +15,12 @@ class DateTimeFieldWidget extends StatefulWidget {
 class _DateTimeFieldWidgetState extends State<DateTimeFieldWidget> {
   void SetReminder(DateTime? dateTime) {
     setState(() {
-      tmpNoteReminder.remindedAt = minReminderAt;
+      tmpNoteReminder.remindedAt = dateTime!;
     });
   }
 
-  bool isReminderOver(DateTime? reminderTime){
-    return reminderTime!.difference(DateTime.now()) > Duration.zero;
+  bool isReminderOver(DateTime? reminderTime) {
+    return reminderTime!.difference(DateTime.now()) <= Duration.zero;
   }
 
   @override
@@ -34,7 +34,7 @@ class _DateTimeFieldWidgetState extends State<DateTimeFieldWidget> {
             Container(
                 padding: const EdgeInsets.only(left: 10, right: 5),
                 child: const Icon(
-                  Icons.calendar_today,
+                  Icons.calendar_month,
                   color: Colors.black,
                   size: 20,
                 )),
@@ -53,9 +53,12 @@ class _DateTimeFieldWidgetState extends State<DateTimeFieldWidget> {
                   ).then((value) => SetReminder(value));
                 },
                 child: Text(
-                  isReminderOver(currentNote!.noteReminder!.remindedAt)
-                      ? "none"
-                      : formattedDate.format(currentNote!.noteReminder!.remindedAt),
+                  tmpNoteReminder.remindedAt != minReminderAt
+                      ? formattedDate.format(tmpNoteReminder.remindedAt)
+                      : isReminderOver(currentNote!.noteReminder!.remindedAt)
+                          ? "Pick a date time"
+                          : formattedDate
+                              .format(currentNote!.noteReminder!.remindedAt),
                   style: TextStyle(
                       fontFamily: Font_Family_LATO,
                       fontSize: Font_Size_DIALOG,
