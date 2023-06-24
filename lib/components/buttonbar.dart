@@ -11,7 +11,9 @@ import '../models/styling.dart';
 class ButtonBarWidget extends StatefulWidget {
   NoteReminder? noteReminder;
   NoteCategory? noteCategory;
-  ButtonBarWidget({this.noteReminder, this.noteCategory,  super.key});
+  LayoutDataProvider? layoutDataProvider;
+  ButtonBarWidget(
+      {this.noteReminder, this.noteCategory, this.layoutDataProvider, key});
 
   @override
   State<ButtonBarWidget> createState() => _ButtonBarWidgetState();
@@ -61,8 +63,8 @@ class _ButtonBarWidgetState extends State<ButtonBarWidget> {
             }
             if (widget.noteCategory != null) {
               setState(() {
-                Provider.of<LayoutDataProvider>(context, listen: false)
-                            .addLatestCategoriesToList(widget.noteCategory!);
+                widget.layoutDataProvider!
+                    .addLatestCategoriesToList(widget.noteCategory!);
               });
               /*postCategoryAsync(widget.noteCategory!)
                   .whenComplete(() => setState(() {

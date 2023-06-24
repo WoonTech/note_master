@@ -8,6 +8,7 @@ import 'package:note_master/models/repetition.dart';
 import 'package:note_master/services/category_access.dart';
 import 'package:note_master/services/note_access.dart';
 
+import '../components/category.dart';
 import 'category.dart';
 
 //Theme
@@ -46,31 +47,31 @@ class LayoutDataProvider extends ChangeNotifier {
 
   void setThemeStyle(int index) {
     switch (index) {
-      case 0:
+      case 1:
         Theme_Color_ROOT = Colors.black;
         Theme_Color_DOMAIN = const Color.fromRGBO(233, 241, 245, 1);
         Theme_Color_SUBDOMAIN = const Color.fromRGBO(245, 245, 245, 1);
         Category = 0;
         break;
-      case 1:
+      case 2:
         Theme_Color_ROOT = const Color.fromRGBO(76, 205, 178, 1);
         Theme_Color_DOMAIN = const Color.fromRGBO(208, 235, 213, 1);
         Theme_Color_SUBDOMAIN = const Color.fromRGBO(155, 210, 172, 1);
         Category = 1;
         break;
-      case 2:
+      case 3:
         Theme_Color_ROOT = const Color.fromRGBO(199, 106, 225, 1);
         Theme_Color_DOMAIN = const Color.fromRGBO(228, 202, 245, 1);
         Theme_Color_SUBDOMAIN = const Color.fromRGBO(207, 172, 234, 1);
         Category = 2;
         break;
-      case 3:
+      case 4:
         Theme_Color_ROOT = const Color.fromRGBO(48, 163, 209, 1);
         Theme_Color_DOMAIN = const Color.fromRGBO(191, 225, 243, 1);
         Theme_Color_SUBDOMAIN = const Color.fromRGBO(139, 202, 227, 1);
         Category = 3;
         break;
-      case 4:
+      case 5:
         Theme_Color_ROOT = const Color.fromRGBO(224, 93, 114, 1);
         Theme_Color_DOMAIN = const Color.fromRGBO(245, 228, 226, 1);
         Theme_Color_SUBDOMAIN = const Color.fromRGBO(242, 184, 193, 1);
@@ -114,6 +115,14 @@ class LayoutDataProvider extends ChangeNotifier {
       notes[cacheNote.id!] = cacheNote;
     }
     notifyListeners();
+  }
+
+  void showCategoryDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) => CategoryAlertBoxWidget(
+              categoryType: note_type,
+            ));
   }
 }
 

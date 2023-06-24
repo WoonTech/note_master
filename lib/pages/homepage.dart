@@ -35,21 +35,23 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).requestFocus(FocusNode());
-        },
-        child: Consumer<LayoutDataProvider>(
-            builder: (context, currentTheme, child) => Stack(
-                  children: [
-                    Container(
-                      color: currentTheme.theme.Theme_Color_SUBDOMAIN,
-                    ),
-                    BodyWidget(
-                        currentTheme: currentTheme,),
-                    const SearchBarWidget()
-                  ],
-                )),
-      ),
+          onTap: () {
+            FocusScope.of(context).requestFocus(FocusNode());
+          },
+          child: Stack(
+            children: [
+              Container(
+                color: Provider.of<LayoutDataProvider>(context, listen: false)
+                    .theme
+                    .Theme_Color_SUBDOMAIN,
+              ),
+              BodyWidget(
+                currentTheme:
+                    Provider.of<LayoutDataProvider>(context, listen: false),
+              ),
+              const SearchBarWidget()
+            ],
+          )),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -68,8 +70,7 @@ class _HomePageState extends State<HomePage> {
 
 class BodyWidget extends StatefulWidget {
   final LayoutDataProvider currentTheme;
-  const BodyWidget(
-      {required this.currentTheme, super.key});
+  const BodyWidget({required this.currentTheme, super.key});
 
   @override
   State<BodyWidget> createState() => _BodyWidgetState();
@@ -175,17 +176,22 @@ class _BodyWidgetState extends State<BodyWidget> {
                                           1) {
                                     showDialog(
                                         context: context,
-                                        builder: (context) => CategoryAlertBoxWidget(
-                                            categoryType: note_type,
-                                          )
-                                        );
+                                        builder: (context) =>
+                                            CategoryAlertBoxWidget(
+                                              layoutDataProvider:
+                                                  widget.currentTheme,
+                                              categoryType: note_type,
+                                            ));
                                   } else {
                                     setState(() {
                                       _current = index;
-                                      if (_current == noteCategories.length) {}
+                                      print(noteCategories[index + 1].name);
+                                      print(noteCategories[index + 1].colorId);
                                       Provider.of<LayoutDataProvider>(context,
                                               listen: false)
-                                          .setThemeStyle(index);
+                                          .setThemeStyle(
+                                              noteCategories[index + 1]
+                                                  .colorId);
                                     });
                                   }
                                 },

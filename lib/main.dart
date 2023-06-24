@@ -54,8 +54,8 @@ class MyApp extends StatelessWidget {
                 resizeToAvoidBottomInset: false,
                 body: ChangeNotifierProvider(
                   create: (context) => LayoutDataProvider(),
-                  child: const MaterialApp(
-                    home: SwipeNavigation(),
+                  child: Consumer<LayoutDataProvider>(
+                    builder: (context, value, child) => SwipeNavigation(),
                   ),
                 )),
           );
@@ -63,16 +63,6 @@ class MyApp extends StatelessWidget {
       },
     );
   }
-
-  @override
-  /*Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => LayoutDataProvider(),
-      child: const MaterialApp(
-        home: SwipeNavigation(),
-      ),
-    );
-  }*/
 
   void updateThemeFromSharedPref() async {}
   Future initializeData() async {

@@ -136,7 +136,6 @@ class _NotePageState extends State<NotePage> {
                           return CategoryAlertBoxWidget(
                             categoryType: note_type,
                           );
-                          
                         });
                   },
                   icon: Icon(

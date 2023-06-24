@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:note_master/components/buttonbar.dart';
 import 'package:note_master/components/colorPalette.dart';
-import 'package:note_master/components/dropdownlist.dart';
 import 'package:note_master/constants/status.dart';
 import 'package:note_master/models/category.dart';
 import 'package:note_master/models/layout.dart';
+import 'package:provider/provider.dart';
 
-import '../models/repetition.dart';
 import '../models/styling.dart';
-import '../services/repetition_access.dart';
 
 late NoteCategory tmpNoteCategory;
 
 class CategoryAlertBoxWidget extends StatefulWidget {
   String categoryType;
-  CategoryAlertBoxWidget({required this.categoryType, super.key});
+  LayoutDataProvider? layoutDataProvider;
+  CategoryAlertBoxWidget(
+      {required this.categoryType, this.layoutDataProvider, super.key});
 
   @override
   State<CategoryAlertBoxWidget> createState() => _CategoryAlertBoxWidgetState();
@@ -86,6 +86,7 @@ class _CategoryAlertBoxWidgetState extends State<CategoryAlertBoxWidget> {
       ),
       actions: [
         ButtonBarWidget(
+          layoutDataProvider: widget.layoutDataProvider,
           noteCategory: tmpNoteCategory,
         )
       ],
