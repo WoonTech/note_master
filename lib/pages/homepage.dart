@@ -45,10 +45,7 @@ class _HomePageState extends State<HomePage> {
                       color: currentTheme.theme.Theme_Color_SUBDOMAIN,
                     ),
                     BodyWidget(
-                        currentTheme: currentTheme,
-                        categories: noteCategories
-                            .where((c) => c.type == note_type)
-                            .toList()),
+                        currentTheme: currentTheme,),
                     const SearchBarWidget()
                   ],
                 )),
@@ -71,9 +68,8 @@ class _HomePageState extends State<HomePage> {
 
 class BodyWidget extends StatefulWidget {
   final LayoutDataProvider currentTheme;
-  final List<NoteCategory> categories;
   const BodyWidget(
-      {required this.currentTheme, required this.categories, super.key});
+      {required this.currentTheme, super.key});
 
   @override
   State<BodyWidget> createState() => _BodyWidgetState();
@@ -101,6 +97,7 @@ class _BodyWidgetState extends State<BodyWidget> {
 
   @override
   Widget build(BuildContext context) {
+    var categories = noteCategories.where((c) => c.type == note_type).toList();
     return Positioned.fill(
       top: 80,
       child: Stack(
@@ -166,7 +163,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                         child: ListView.builder(
                             physics: const BouncingScrollPhysics(),
                             scrollDirection: Axis.horizontal,
-                            itemCount: widget.categories.length,
+                            itemCount: categories.length,
                             itemBuilder: (context, index) {
                               return GestureDetector(
                                 onTap: () {
@@ -178,11 +175,10 @@ class _BodyWidgetState extends State<BodyWidget> {
                                           1) {
                                     showDialog(
                                         context: context,
-                                        builder: (BuildContext context) {
-                                          return CategoryAlertBoxWidget(
+                                        builder: (context) => CategoryAlertBoxWidget(
                                             categoryType: note_type,
-                                          );
-                                        });
+                                          )
+                                        );
                                   } else {
                                     setState(() {
                                       _current = index;
@@ -212,7 +208,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                                   child: Padding(
                                     padding: const EdgeInsets.only(
                                         left: 12, right: 10, top: 6, bottom: 6),
-                                    child: Text(widget.categories[index].name,
+                                    child: Text(categories[index].name,
                                         textAlign: TextAlign.justify,
                                         style: TextStyle(
                                             color: _current == index

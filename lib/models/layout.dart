@@ -90,6 +90,11 @@ class LayoutDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void addLatestCategoriesToList(NoteCategory noteCategory) {
+    noteCategories.insert(noteCategories.length - 1, noteCategory);
+    notifyListeners();
+  }
+
   Future<void> getNoteCategories() async {
     noteCategories =
         (await getCategoriesAsync()).where((c) => c.type == note_type).toList();

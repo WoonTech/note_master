@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:note_master/models/category.dart';
 import 'package:note_master/models/layout.dart';
 import 'package:note_master/services/category_access.dart';
+import 'package:provider/provider.dart';
 
 import '../models/notereminder.dart';
 import '../models/styling.dart';
@@ -10,7 +11,7 @@ import '../models/styling.dart';
 class ButtonBarWidget extends StatefulWidget {
   NoteReminder? noteReminder;
   NoteCategory? noteCategory;
-  ButtonBarWidget({this.noteReminder, this.noteCategory, super.key});
+  ButtonBarWidget({this.noteReminder, this.noteCategory,  super.key});
 
   @override
   State<ButtonBarWidget> createState() => _ButtonBarWidgetState();
@@ -59,8 +60,10 @@ class _ButtonBarWidgetState extends State<ButtonBarWidget> {
               toggleReminder(widget.noteReminder!.remindedAt);
             }
             if (widget.noteCategory != null) {
-              noteCategories.add(widget.noteCategory!);
-
+              setState(() {
+                Provider.of<LayoutDataProvider>(context, listen: false)
+                            .addLatestCategoriesToList(widget.noteCategory!);
+              });
               /*postCategoryAsync(widget.noteCategory!)
                   .whenComplete(() => setState(() {
                         noteCategories.add(widget.noteCategory!);
