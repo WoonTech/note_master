@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:note_master/components/reminder.dart';
+import 'package:note_master/models/category.dart';
 import 'package:note_master/models/noteheader.dart';
 import 'package:intl/intl.dart';
 import '../models/layout.dart';
@@ -39,7 +40,7 @@ class _CardWidgetState extends State<CardWidget> {
               decoration: BoxDecoration(
                   border: Border(
                       left: BorderSide(
-                          color: widget.currentTheme.theme.Theme_Color_ROOT,
+                          color: rootColors[noteCategories.where((element) => element.id == (widget.note.categoryId ?? category_default_ID)).first.colorId] ,
                           width: 7))),
               child: Padding(
                 padding: const EdgeInsets.only(

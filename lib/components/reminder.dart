@@ -73,15 +73,14 @@ class _ReminderAlertBoxWidgetState extends State<ReminderAlertBoxWidget> {
           Radius.circular(25.0),
         ),
       ),
-      titlePadding: const EdgeInsets.only(left: 50, top: 20),
-      title: Text(
+      title: Center(child: Text(
         'Set Reminder',
         style: TextStyle(
             color: Font_Color_Default,
             fontFamily: Font_Family_LATO,
             fontSize: Font_Size_HEADER,
             fontWeight: FontWeight.w500),
-      ),
+      ),), 
       contentPadding: const EdgeInsets.only(left: 20, right: 20, top: 20),
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

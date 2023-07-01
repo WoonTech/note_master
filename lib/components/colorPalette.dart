@@ -28,7 +28,7 @@ class _ColorPaletteWidgetState extends State<ColorPaletteWidget> {
               selectedValue = value;
             });
           },
-          color: themeColors[0],
+          color: subDomainColors[0],
         ),
         SizedBox(
           width: 15,
@@ -42,7 +42,7 @@ class _ColorPaletteWidgetState extends State<ColorPaletteWidget> {
               selectedValue = value;
             });
           },
-          color: themeColors[1],
+          color: subDomainColors[1],
         ),
         SizedBox(
           width: 15,
@@ -56,7 +56,7 @@ class _ColorPaletteWidgetState extends State<ColorPaletteWidget> {
               selectedValue = value;
             });
           },
-          color: themeColors[2],
+          color: subDomainColors[2],
         ),
         SizedBox(
           width: 15,
@@ -70,7 +70,7 @@ class _ColorPaletteWidgetState extends State<ColorPaletteWidget> {
               selectedValue = value;
             });
           },
-          color: themeColors[3],
+          color: subDomainColors[3],
         ),
         SizedBox(
           width: 15,
@@ -84,7 +84,7 @@ class _ColorPaletteWidgetState extends State<ColorPaletteWidget> {
               selectedValue = value;
             });
           },
-          color: themeColors[4],
+          color: subDomainColors[4],
         ),
       ],
     );

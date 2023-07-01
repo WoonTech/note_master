@@ -45,8 +45,7 @@ class _NotePageState extends State<NotePage> {
     if (widget.cardNote != null) {
       currentNote = widget.cardNote;
       isReminderSet = isReminderOver(widget.cardNote!.noteReminder!.remindedAt);
-      categorySelectedValue = widget.cardNote!.categoryId!;
-      print(categorySelectedValue);
+      categorySelectedValue = widget.cardNote!.categoryId ?? 1;
       titleTextEditingController.text = widget.cardNote!.title;
       contentTextEditingController.text = widget.cardNote!.noteDetail!.content;
     } else {
@@ -136,7 +135,7 @@ class _NotePageState extends State<NotePage> {
                 child: PopupMenuButton(
                   icon: Icon(
                     Icons.book,
-                    color: themeColors[noteCategories
+                    color: subDomainColors[noteCategories
                         .where((element) => element.id == categorySelectedValue)
                         .first
                         .colorId],
@@ -161,7 +160,7 @@ class _NotePageState extends State<NotePage> {
                               Icons.circle,
                               color: category.name == category_default_selection
                                   ? Colors.transparent
-                                  : themeColors[category.colorId],
+                                  : subDomainColors[category.colorId],
                             ),
                             const SizedBox(
                               width: 10,

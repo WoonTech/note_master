@@ -87,7 +87,7 @@ class _CategoryAlertBoxWidgetState extends State<CategoryAlertBoxWidget> {
       actions: [
         ButtonBarWidget(
           layoutDataProvider: widget.layoutDataProvider,
-          noteCategory: tmpNoteCategory,
+          noteCategoryToBeAdded: tmpNoteCategory,
         )
       ],
     );
@@ -135,5 +135,54 @@ class _CategoryTextFieldWidgetState extends State<CategoryTextFieldWidget> {
             ),
           ],
         ));
+  }
+}
+
+class RemoveCategoryAlertBoxWidget extends StatefulWidget {
+  NoteCategory category;
+  LayoutDataProvider layoutDataProvider;
+  RemoveCategoryAlertBoxWidget({required this.category, required this.layoutDataProvider, super.key});
+
+  @override
+  State<RemoveCategoryAlertBoxWidget> createState() => _RemoveCategoryAlertBoxWidgetState();
+}
+
+class _RemoveCategoryAlertBoxWidgetState extends State<RemoveCategoryAlertBoxWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(25.0),
+        ),
+      ),
+      contentPadding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Center(
+            child: Text(
+              (widget.category.id == category_default_ID  || widget.category.id == 0)
+              ? 'Unable to delete default category'
+              : 'Delete ${widget.category.name}?',
+              style: TextStyle(
+                color: Font_Color_Default,
+                fontFamily: Font_Family_LATO,
+                fontSize: Font_Size_HEADER,
+                fontWeight: FontWeight.w500
+              ),
+            ),
+          )
+        ],
+      ),
+      actions: [
+        ButtonBarWidget(
+          layoutDataProvider: widget.layoutDataProvider,
+          noteCategoryToBeRemoved: widget.category,
+        )
+      ],
+    );
+  
   }
 }

@@ -15,7 +15,7 @@ import '../utils/dataAccess.dart';
 import 'notepage.dart';
 
 String _selectText = 'reminder: 5 days';
-int currentCategoryIndex = 0;
+int currentCategoryIndex = 1;
 
 List<String> dropdownList = ['Notes', 'reminder: 10 days', 'reminder: 20 days'];
 
@@ -87,7 +87,7 @@ class _BodyWidgetState extends State<BodyWidget> {
   void initState() {
     super.initState();
     getNotes();
-    currentCategoryIndex = 0;
+    currentCategoryIndex = 1;
   }
 
   Future<void> getNotes() async {
@@ -105,7 +105,7 @@ class _BodyWidgetState extends State<BodyWidget> {
         ? notes.values
         : notes.values
             .where((element) => element.categoryId == currentCategoryIndex);
-
+  print(currentCategoryIndex);
     return Positioned.fill(
       top: 80,
       child: Stack(
@@ -174,6 +174,16 @@ class _BodyWidgetState extends State<BodyWidget> {
                             itemCount: noteCategories.length,
                             itemBuilder: (context, index) {
                               return GestureDetector(
+                                onLongPress: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) =>
+                                            RemoveCategoryAlertBoxWidget(
+                                              category: noteCategories[index],
+                                              layoutDataProvider:
+                                                  widget.layoutData,
+                                            ));
+                                },
                                 onTap: () {
                                   if (index == noteCategories.length - 1) {
                                     showDialog(
@@ -186,7 +196,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                                             ));
                                   } else {
                                     setState(() {
-                                      currentCategoryIndex = index;
+                                      currentCategoryIndex = noteCategories[index].id!;
                                       widget.layoutData.setThemeStyle(
                                           noteCategories[index].colorId);
                                     });
@@ -197,14 +207,14 @@ class _BodyWidgetState extends State<BodyWidget> {
                                   decoration: BoxDecoration(
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(15)),
-                                    border: currentCategoryIndex == index
+                                    border: currentCategoryIndex == noteCategories[index].id
                                         ? Border.all(
                                             color: widget.layoutData.theme
                                                 .Theme_Color_ROOT)
                                         : Border.all(
                                             color:
                                                 Category_BorderColor_DESELECTED),
-                                    color: currentCategoryIndex == index
+                                    color: currentCategoryIndex == noteCategories[index].id
                                         ? Category_Color_SELECTED
                                         : Category_Color_DESELECTED,
                                   ),
@@ -214,7 +224,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                                     child: Text(noteCategories[index].name,
                                         textAlign: TextAlign.justify,
                                         style: TextStyle(
-                                            color: currentCategoryIndex == index
+                                            color: currentCategoryIndex == noteCategories[index].id
                                                 ? Font_Color_Default
                                                 : Font_Color_UNSELECTED,
                                             fontSize: Font_Size_CONTENT,

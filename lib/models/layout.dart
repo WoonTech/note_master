@@ -23,12 +23,20 @@ HashMap<int, NoteHeader> notes = HashMap();
 List<NoteCategory> noteCategories = [];
 List<NoteCategory> checkListCategories = [];
 List<NoteRepetition> noteRepetitions = [];
-List<Color> themeColors = [
+List<Color> subDomainColors = [
   Colors.black,
   const Color.fromRGBO(155, 210, 172, 1),
   const Color.fromRGBO(139, 202, 227, 1),
   const Color.fromRGBO(207, 172, 234, 1),
   const Color.fromRGBO(242, 184, 193, 1)
+];
+
+List<Color> rootColors = [
+  Colors.black,
+  const Color.fromRGBO(76, 205, 178, 1),
+  const Color.fromRGBO(48, 163, 209, 1),
+  const Color.fromRGBO(199, 106, 225, 1),
+  const Color.fromRGBO(224, 93, 114, 1),
 ];
 NoteHeader? currentNote;
 
@@ -101,6 +109,12 @@ class LayoutDataProvider extends ChangeNotifier {
 
   void addLatestCategoriesToList(NoteCategory noteCategory) {
     noteCategories.insert(noteCategories.length - 1, noteCategory);
+    notifyListeners();
+  }
+
+  void removeCurrentCategoriesFromList(NoteCategory noteCategory){
+    noteCategories.removeWhere((element) => element.id == noteCategory.id);
+    notes.values.toList().where((n) => n.categoryId == noteCategory.id).forEach((n) => n.categoryId = category_default_ID);
     notifyListeners();
   }
 

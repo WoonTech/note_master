@@ -10,10 +10,11 @@ import '../models/styling.dart';
 
 class ButtonBarWidget extends StatefulWidget {
   NoteReminder? noteReminder;
-  NoteCategory? noteCategory;
+  NoteCategory? noteCategoryToBeAdded;
+  NoteCategory? noteCategoryToBeRemoved;
   LayoutDataProvider? layoutDataProvider;
   ButtonBarWidget(
-      {this.noteReminder, this.noteCategory, this.layoutDataProvider, key});
+      {this.noteReminder, this.noteCategoryToBeAdded, this.noteCategoryToBeRemoved, this.layoutDataProvider, key});
 
   @override
   State<ButtonBarWidget> createState() => _ButtonBarWidgetState();
@@ -40,48 +41,75 @@ class _ButtonBarWidgetState extends State<ButtonBarWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return ButtonBar(
-      alignment: MainAxisAlignment.spaceEvenly,
-      mainAxisSize: MainAxisSize.max,
-      layoutBehavior: ButtonBarLayoutBehavior.constrained,
-      children: <Widget>[
-        TextButton(
-          onPressed: () => {Navigator.of(context).pop()},
-          child: Text(
-            'CANCEL',
-            style: TextStyle(
-              fontFamily: Font_Family_LATO,
-              fontSize: Font_Size_DIALOG,
-              color: Theme_Color_SYSTEM,
+    return widget.noteCategoryToBeRemoved != null 
+      && (widget.noteCategoryToBeRemoved!.id == category_default_ID
+      || widget.noteCategoryToBeRemoved!.id == 0)
+      ? ButtonBar(
+        alignment: MainAxisAlignment.spaceEvenly,
+        mainAxisSize: MainAxisSize.max,
+        layoutBehavior: ButtonBarLayoutBehavior.constrained,
+        children: [
+          TextButton(
+            onPressed: () => {Navigator.of(context).pop()},
+            child: Text(
+              'OK',
+              style: TextStyle(
+                fontFamily: Font_Family_LATO,
+                fontSize: Font_Size_DIALOG,
+                color: Theme_Color_SYSTEM,
+              ),
+            ),
+          ),          
+        ],  
+      )
+      : ButtonBar(
+        alignment: MainAxisAlignment.spaceEvenly,
+        mainAxisSize: MainAxisSize.max,
+        layoutBehavior: ButtonBarLayoutBehavior.constrained,
+        children: <Widget>[
+          TextButton(
+            onPressed: () => {Navigator.of(context).pop()},
+            child: Text(
+              'CANCEL',
+              style: TextStyle(
+                fontFamily: Font_Family_LATO,
+                fontSize: Font_Size_DIALOG,
+                color: Theme_Color_SYSTEM,
+              ),
             ),
           ),
-        ),
-        VerticalDivider(),
-        TextButton(
-          onPressed: () {
-            if (widget.noteReminder != null) {
-              toggleReminder(widget.noteReminder!.remindedAt);
-            }
-            if (widget.noteCategory != null) {
-              postCategoryAsync(widget.noteCategory!)
-                  .whenComplete(() => setState(() {
-                        widget.layoutDataProvider!
-                            .addLatestCategoriesToList(widget.noteCategory!);
-                      }));
-            }
-            Navigator.of(context).pop();
-          },
-          child: Text(
-            'DONE',
-            style: TextStyle(
-              fontFamily: Font_Family_LATO,
-              fontSize: Font_Size_DIALOG,
-              color: Theme_Color_SYSTEM,
+          TextButton(
+            onPressed: () {
+              if (widget.noteReminder != null) {
+                toggleReminder(widget.noteReminder!.remindedAt);
+              }
+              if (widget.noteCategoryToBeAdded != null) {
+                postCategoryAsync(widget.noteCategoryToBeAdded!)
+                    .then((value) => widget.noteCategoryToBeAdded!.id = value)
+                    .whenComplete(() => setState(() {
+                          widget.layoutDataProvider!
+                              .addLatestCategoriesToList(widget.noteCategoryToBeAdded!);
+                        }));
+              }
+              if (widget.noteCategoryToBeRemoved != null) {
+                deleteCategoryAsync(widget.noteCategoryToBeRemoved!)
+                    .whenComplete(() => setState(() {
+                          widget.layoutDataProvider!
+                              .removeCurrentCategoriesFromList(widget.noteCategoryToBeRemoved!);
+                        }));
+              }
+              Navigator.of(context).pop();
+            },
+            child: Text(
+              widget.noteCategoryToBeRemoved != null ? "OK": 'DONE',
+              style: TextStyle(
+                fontFamily: Font_Family_LATO,
+                fontSize: Font_Size_DIALOG,
+                color: Theme_Color_SYSTEM,
+              ),
             ),
           ),
-        ),
-      ],
-    );
-    ;
+        ],
+      );
   }
 }
