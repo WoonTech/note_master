@@ -56,20 +56,18 @@ class _ButtonBarWidgetState extends State<ButtonBarWidget> {
             ),
           ),
         ),
+        VerticalDivider(),
         TextButton(
           onPressed: () {
             if (widget.noteReminder != null) {
               toggleReminder(widget.noteReminder!.remindedAt);
             }
             if (widget.noteCategory != null) {
-              setState(() {
-                widget.layoutDataProvider!
-                    .addLatestCategoriesToList(widget.noteCategory!);
-              });
-              /*postCategoryAsync(widget.noteCategory!)
+              postCategoryAsync(widget.noteCategory!)
                   .whenComplete(() => setState(() {
-                        noteCategories.add(widget.noteCategory!);
-                      }));*/
+                        widget.layoutDataProvider!
+                            .addLatestCategoriesToList(widget.noteCategory!);
+                      }));
             }
             Navigator.of(context).pop();
           },

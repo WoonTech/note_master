@@ -37,7 +37,7 @@ class _CategoryAlertBoxWidgetState extends State<CategoryAlertBoxWidget> {
         name: "",
         status: activeStatus,
         type: widget.categoryType,
-        colorId: 1);
+        colorId: category_default_ColorID);
   }
 
   @override

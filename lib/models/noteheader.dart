@@ -10,7 +10,7 @@ class NoteHeader {
   String title;
   bool isPinned = false;
   String status;
-  String category;
+  int? categoryId;
   NoteDetail? noteDetail;
   NoteReminder? noteReminder;
 
@@ -21,7 +21,7 @@ class NoteHeader {
       required this.title,
       this.isPinned = false,
       this.status = activeStatus,
-      this.category = category_default});
+      this.categoryId = category_default_ID});
 
   factory NoteHeader.fromJson(Map<String, dynamic> json) {
     var noteHeader = NoteHeader(
@@ -31,7 +31,7 @@ class NoteHeader {
         title: json['Title'],
         isPinned: json['IsPinned'] == "true" ? true : false,
         status: json['Status'],
-        category: json['CategoryID']);
+        categoryId: int.parse(json['CategoryID']));
     noteHeader.noteDetail = NoteDetail(
         id: json['DetailID'], noteId: json['ID'], content: json['Content']);
     var notificationId = json['ReminderID'];

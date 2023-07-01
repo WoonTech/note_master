@@ -21,7 +21,15 @@ Color Theme_Color_SYSTEM = const Color.fromRGBO(37, 87, 218, 1);
 int Category = 0;
 HashMap<int, NoteHeader> notes = HashMap();
 List<NoteCategory> noteCategories = [];
+List<NoteCategory> checkListCategories = [];
 List<NoteRepetition> noteRepetitions = [];
+List<Color> themeColors = [
+  Colors.black,
+  const Color.fromRGBO(155, 210, 172, 1),
+  const Color.fromRGBO(139, 202, 227, 1),
+  const Color.fromRGBO(207, 172, 234, 1),
+  const Color.fromRGBO(242, 184, 193, 1)
+];
 NoteHeader? currentNote;
 
 class BackgroundTheme {
@@ -47,17 +55,23 @@ class LayoutDataProvider extends ChangeNotifier {
 
   void setThemeStyle(int index) {
     switch (index) {
-      case 1:
+      case 0:
         Theme_Color_ROOT = Colors.black;
         Theme_Color_DOMAIN = const Color.fromRGBO(233, 241, 245, 1);
         Theme_Color_SUBDOMAIN = const Color.fromRGBO(245, 245, 245, 1);
         Category = 0;
         break;
-      case 2:
+      case 1:
         Theme_Color_ROOT = const Color.fromRGBO(76, 205, 178, 1);
         Theme_Color_DOMAIN = const Color.fromRGBO(208, 235, 213, 1);
         Theme_Color_SUBDOMAIN = const Color.fromRGBO(155, 210, 172, 1);
         Category = 1;
+        break;
+      case 2:
+        Theme_Color_ROOT = const Color.fromRGBO(48, 163, 209, 1);
+        Theme_Color_DOMAIN = const Color.fromRGBO(191, 225, 243, 1);
+        Theme_Color_SUBDOMAIN = const Color.fromRGBO(139, 202, 227, 1);
+        Category = 3;
         break;
       case 3:
         Theme_Color_ROOT = const Color.fromRGBO(199, 106, 225, 1);
@@ -66,12 +80,6 @@ class LayoutDataProvider extends ChangeNotifier {
         Category = 2;
         break;
       case 4:
-        Theme_Color_ROOT = const Color.fromRGBO(48, 163, 209, 1);
-        Theme_Color_DOMAIN = const Color.fromRGBO(191, 225, 243, 1);
-        Theme_Color_SUBDOMAIN = const Color.fromRGBO(139, 202, 227, 1);
-        Category = 3;
-        break;
-      case 5:
         Theme_Color_ROOT = const Color.fromRGBO(224, 93, 114, 1);
         Theme_Color_DOMAIN = const Color.fromRGBO(245, 228, 226, 1);
         Theme_Color_SUBDOMAIN = const Color.fromRGBO(242, 184, 193, 1);

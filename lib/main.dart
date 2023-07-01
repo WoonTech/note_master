@@ -73,27 +73,28 @@ class MyApp extends StatelessWidget {
       var nmNoteCategory = NoteCategory(
           createdAt: currentTime,
           updatedAt: currentTime,
-          name: category_default,
+          name: category_default_string,
           status: activeStatus,
           type: note_type,
-          colorId: 1);
+          colorId: 0);
       var nmChecklistCategory = NoteCategory(
           createdAt: currentTime,
           updatedAt: currentTime,
-          name: category_default,
+          name: category_default_string,
           status: activeStatus,
           type: checklist_type,
-          colorId: 1);
+          colorId: 0);
       await postCategoryAsync(nmNoteCategory);
       await postCategoryAsync(nmChecklistCategory);
       categories = await getCategoriesAsync();
     }
     categories.add(NoteCategory(
+        id: 0,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
-        name: "Add New +",
+        name: category_default_selection,
         status: activeStatus,
-        type: note_type,
+        type: null,
         colorId: 1));
 
     var repetitions = await getRepetitionsAsync();
@@ -110,7 +111,14 @@ class MyApp extends StatelessWidget {
     }
 
     noteRepetitions = repetitions;
-    noteCategories = categories;
+    noteCategories = categories
+        .where(
+            (category) => category.type == note_type || category.type == null)
+        .toList();
+    checkListCategories = categories
+        .where((category) =>
+            category.type == checklist_type || category.type == null)
+        .toList();
   }
 }
 

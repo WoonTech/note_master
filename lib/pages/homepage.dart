@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:note_master/components/category.dart';
 import 'package:note_master/constants/status.dart';
@@ -13,8 +14,8 @@ import '../services/note_access.dart';
 import '../utils/dataAccess.dart';
 import 'notepage.dart';
 
-int _current = 0;
 String _selectText = 'reminder: 5 days';
+int currentCategoryIndex = 0;
 
 List<String> dropdownList = ['Notes', 'reminder: 10 days', 'reminder: 20 days'];
 
@@ -27,11 +28,12 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _current = 0;
+    currentCategoryIndex = 0;
   }
 
   @override
   Widget build(BuildContext context) {
+    var layoutData = Provider.of<LayoutDataProvider>(context, listen: false);
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: GestureDetector(
@@ -41,13 +43,10 @@ class _HomePageState extends State<HomePage> {
           child: Stack(
             children: [
               Container(
-                color: Provider.of<LayoutDataProvider>(context, listen: false)
-                    .theme
-                    .Theme_Color_SUBDOMAIN,
+                color: layoutData.theme.Theme_Color_SUBDOMAIN,
               ),
               BodyWidget(
-                currentTheme:
-                    Provider.of<LayoutDataProvider>(context, listen: false),
+                layoutData: layoutData,
               ),
               const SearchBarWidget()
             ],
@@ -55,7 +54,11 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => NotePage()));
+              context,
+              MaterialPageRoute(
+                  builder: (context) => NotePage(
+                        layoutData: layoutData,
+                      )));
         },
         backgroundColor: Colors.black,
         child: const Icon(
@@ -69,8 +72,8 @@ class _HomePageState extends State<HomePage> {
 }
 
 class BodyWidget extends StatefulWidget {
-  final LayoutDataProvider currentTheme;
-  const BodyWidget({required this.currentTheme, super.key});
+  final LayoutDataProvider layoutData;
+  BodyWidget({required this.layoutData, super.key});
 
   @override
   State<BodyWidget> createState() => _BodyWidgetState();
@@ -84,7 +87,7 @@ class _BodyWidgetState extends State<BodyWidget> {
   void initState() {
     super.initState();
     getNotes();
-    _current = 0;
+    currentCategoryIndex = 0;
   }
 
   Future<void> getNotes() async {
@@ -98,14 +101,18 @@ class _BodyWidgetState extends State<BodyWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var categories = noteCategories.where((c) => c.type == note_type).toList();
+    var correspondingNotes = currentCategoryIndex == category_default_ID
+        ? notes.values
+        : notes.values
+            .where((element) => element.categoryId == currentCategoryIndex);
+
     return Positioned.fill(
       top: 80,
       child: Stack(
         alignment: Alignment.topLeft,
         children: [
           Container(
-            color: widget.currentTheme.theme.Theme_Color_SUBDOMAIN,
+            color: widget.layoutData.theme.Theme_Color_SUBDOMAIN,
           ),
           Positioned.fill(
               child: Container(
@@ -115,7 +122,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                       borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(25),
                           topRight: Radius.circular(25)),
-                      color: widget.currentTheme.theme.Theme_Color_DOMAIN),
+                      color: widget.layoutData.theme.Theme_Color_DOMAIN),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -145,7 +152,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                             )
                           ])),
                           Text(
-                            '${notes.length} notes',
+                            '${correspondingNotes.length} notes',
                             style: TextStyle(
                                 fontSize: 16, color: Font_Color_Default),
                           ),
@@ -164,34 +171,24 @@ class _BodyWidgetState extends State<BodyWidget> {
                         child: ListView.builder(
                             physics: const BouncingScrollPhysics(),
                             scrollDirection: Axis.horizontal,
-                            itemCount: categories.length,
+                            itemCount: noteCategories.length,
                             itemBuilder: (context, index) {
                               return GestureDetector(
                                 onTap: () {
-                                  if (index ==
-                                      noteCategories
-                                              .where((element) =>
-                                                  element.type == note_type)
-                                              .length -
-                                          1) {
+                                  if (index == noteCategories.length - 1) {
                                     showDialog(
                                         context: context,
                                         builder: (context) =>
                                             CategoryAlertBoxWidget(
                                               layoutDataProvider:
-                                                  widget.currentTheme,
+                                                  widget.layoutData,
                                               categoryType: note_type,
                                             ));
                                   } else {
                                     setState(() {
-                                      _current = index;
-                                      print(noteCategories[index + 1].name);
-                                      print(noteCategories[index + 1].colorId);
-                                      Provider.of<LayoutDataProvider>(context,
-                                              listen: false)
-                                          .setThemeStyle(
-                                              noteCategories[index + 1]
-                                                  .colorId);
+                                      currentCategoryIndex = index;
+                                      widget.layoutData.setThemeStyle(
+                                          noteCategories[index].colorId);
                                     });
                                   }
                                 },
@@ -200,24 +197,24 @@ class _BodyWidgetState extends State<BodyWidget> {
                                   decoration: BoxDecoration(
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(15)),
-                                    border: _current == index
+                                    border: currentCategoryIndex == index
                                         ? Border.all(
-                                            color: widget.currentTheme.theme
+                                            color: widget.layoutData.theme
                                                 .Theme_Color_ROOT)
                                         : Border.all(
                                             color:
                                                 Category_BorderColor_DESELECTED),
-                                    color: _current == index
+                                    color: currentCategoryIndex == index
                                         ? Category_Color_SELECTED
                                         : Category_Color_DESELECTED,
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.only(
                                         left: 12, right: 10, top: 6, bottom: 6),
-                                    child: Text(categories[index].name,
+                                    child: Text(noteCategories[index].name,
                                         textAlign: TextAlign.justify,
                                         style: TextStyle(
-                                            color: _current == index
+                                            color: currentCategoryIndex == index
                                                 ? Font_Color_Default
                                                 : Font_Color_UNSELECTED,
                                             fontSize: Font_Size_CONTENT,
@@ -234,7 +231,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                           child: ListView.builder(
                               physics: const BouncingScrollPhysics(),
                               scrollDirection: Axis.vertical,
-                              itemCount: notes.length,
+                              itemCount: correspondingNotes.length,
                               itemBuilder: (context, index) {
                                 return GestureDetector(
                                     onTap: () {
@@ -242,12 +239,13 @@ class _BodyWidgetState extends State<BodyWidget> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) => NotePage(
-                                                  cardNote: notes.values
+                                                  layoutData: widget.layoutData,
+                                                  cardNote: correspondingNotes
                                                       .elementAt(index))));
                                     },
                                     child: CardWidget(
-                                      note: notes.values.elementAt(index),
-                                      currentTheme: widget.currentTheme,
+                                      note: correspondingNotes.elementAt(index),
+                                      currentTheme: widget.layoutData,
                                       contentHeight: _contentHeight,
                                     ));
                               }),

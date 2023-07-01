@@ -92,7 +92,7 @@ class _ReminderAlertBoxWidgetState extends State<ReminderAlertBoxWidget> {
             height: 5,
           ),
           DropDownFieldWidget(
-            repetitions: noteRepetitions,
+            noteRepetitions: noteRepetitions,
           ),
           const SizedBox(
             height: 5,

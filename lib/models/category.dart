@@ -1,8 +1,11 @@
 import 'package:note_master/constants/status.dart';
 
-const String category_default = 'All';
+const int category_default_ID = 1;
+const int category_default_ColorID = 0;
+const String category_default_string = 'All';
 const String note_type = 'note';
 const String checklist_type = 'checklist';
+const String category_default_selection = 'Add New +';
 
 class NoteCategory {
   int? id;

@@ -38,7 +38,7 @@ Future<int?> postNoteHeaderAsync(NoteHeader noteHeader) async {
         'Title': noteHeader.title.trim(),
         'IsPinned': noteHeader.isPinned.toString(),
         'Status': noteHeader.status,
-        'CategoryID': noteHeader.category
+        'CategoryID': noteHeader.categoryId
       });
     });
   } catch (e) {
@@ -78,8 +78,8 @@ Future postNoteReminderAsync(int noteId, NoteReminder noteReminder) async {
 }
 
 Future<List<NoteHeader>> getNotesAsync(
-    {String category = category_default}) async {
-  String getNotesQuery = category == category_default
+    {int category = category_default_ID}) async {
+  String getNotesQuery = category == category_default_ID
       ? '''
   Select NoteHeader.*, 
   NoteDetail.ID as DetailID, NoteDetail.Content, 
@@ -97,7 +97,7 @@ Future<List<NoteHeader>> getNotesAsync(
   ''';
 
   var db = (await database);
-  var results = category == category_default
+  var results = category == category_default_ID
       ? await db.rawQuery(getNotesQuery)
       : await db.rawQuery(getNotesQuery, [category]);
   try {
@@ -180,7 +180,7 @@ Future<NoteHeader> patchNoteAsync(NoteHeader note) async {
             'Title': note.title.trim(),
             'IsPinned': note.isPinned.toString(),
             'Status': note.status,
-            'CategoryID': note.category
+            'CategoryID': note.categoryId
           },
           where: 'Id = ?',
           whereArgs: [note.id]);

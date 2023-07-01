@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:note_master/components/category.dart';
+import 'package:note_master/main.dart';
 import 'package:note_master/models/category.dart';
 import 'package:note_master/models/layout.dart';
 import 'package:note_master/models/notedetail.dart';
@@ -9,6 +10,7 @@ import 'package:note_master/models/styling.dart';
 import 'package:note_master/services/note_access.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../components/dropdownlist.dart';
 import '../components/reminder.dart';
 import '../constants/status.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -18,8 +20,8 @@ import '../services/repetition_access.dart';
 
 class NotePage extends StatefulWidget {
   NoteHeader? cardNote;
-
-  NotePage({this.cardNote, super.key});
+  LayoutDataProvider? layoutData;
+  NotePage({this.cardNote, this.layoutData, key});
 
   @override
   State<NotePage> createState() => _NotePageState();
@@ -27,6 +29,7 @@ class NotePage extends StatefulWidget {
 
 class _NotePageState extends State<NotePage> {
   bool isReminderSet = false;
+  int categorySelectedValue = 1;
   DateTime createdAt = DateTime.now();
   TextEditingController contentTextEditingController = TextEditingController();
   TextEditingController titleTextEditingController = TextEditingController();
@@ -42,6 +45,8 @@ class _NotePageState extends State<NotePage> {
     if (widget.cardNote != null) {
       currentNote = widget.cardNote;
       isReminderSet = isReminderOver(widget.cardNote!.noteReminder!.remindedAt);
+      categorySelectedValue = widget.cardNote!.categoryId!;
+      print(categorySelectedValue);
       titleTextEditingController.text = widget.cardNote!.title;
       contentTextEditingController.text = widget.cardNote!.noteDetail!.content;
     } else {
@@ -94,7 +99,7 @@ class _NotePageState extends State<NotePage> {
         title: titleTextEditingController.text,
         isPinned: currentNote!.isPinned,
         status: currentNote?.status ?? activeStatus,
-        category: currentNote?.category ?? category_default);
+        categoryId: currentNote?.categoryId ?? category_default_ID);
     var noteDetail = NoteDetail(content: contentTextEditingController.text);
     var noteReminder = NoteReminder(
         remindedAt:
@@ -127,22 +132,45 @@ class _NotePageState extends State<NotePage> {
           ),
           actions: [
             Container(
-              margin: const EdgeInsets.only(right: 5),
-              child: IconButton(
-                  onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return CategoryAlertBoxWidget(
-                            categoryType: note_type,
-                          );
-                        });
-                  },
+                margin: const EdgeInsets.only(right: 5),
+                child: PopupMenuButton(
                   icon: Icon(
                     Icons.book,
-                    color: NotepadIcon_Color,
-                  )),
-            ),
+                    color: themeColors[noteCategories
+                        .where((element) => element.id == categorySelectedValue)
+                        .first
+                        .colorId],
+                  ),
+                  onSelected: (newValue) {
+                    setState(() {
+                      currentNote?.categoryId = newValue;
+                      categorySelectedValue = newValue;
+                      tmpNoteCategory = noteCategories
+                          .where((element) => element.id == newValue)
+                          .first;
+                    });
+                  },
+                  itemBuilder: (context) => noteCategories
+                      .where((element) => element.type == note_type)
+                      .map((category) {
+                    return PopupMenuItem(
+                        value: category.id,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.circle,
+                              color: category.name == category_default_selection
+                                  ? Colors.transparent
+                                  : themeColors[category.colorId],
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text(category.name)
+                          ],
+                        ));
+                  }).toList(),
+                )),
             Container(
               margin: const EdgeInsets.only(right: 5),
               child: IconButton(
@@ -188,7 +216,7 @@ class _NotePageState extends State<NotePage> {
                         .then((value) => widget.cardNote = value)
                         .whenComplete(() {
                       setState(() {
-                        Provider.of<LayoutDataProvider>(context, listen: false)
+                        widget.layoutData!
                             .addLatestNoteToList(widget.cardNote!);
                       });
                       FocusScope.of(context).requestFocus(FocusNode());
