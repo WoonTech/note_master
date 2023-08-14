@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:note_master/components/category.dart';
+import 'package:note_master/widgets/category_widget.dart';
 import 'package:note_master/main.dart';
 import 'package:note_master/models/category.dart';
 import 'package:note_master/models/layout.dart';
@@ -7,16 +7,14 @@ import 'package:note_master/models/notedetail.dart';
 import 'package:note_master/models/noteheader.dart';
 import 'package:note_master/models/notereminder.dart';
 import 'package:note_master/models/styling.dart';
-import 'package:note_master/services/note_access.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../components/dropdownlist.dart';
-import '../components/reminder.dart';
+import '../services/data_access.dart';
+import '../widgets/reminder.dart';
 import '../constants/status.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '../models/repetition.dart';
-import '../services/repetition_access.dart';
 
 class NotePage extends StatefulWidget {
   NoteHeader? cardNote;

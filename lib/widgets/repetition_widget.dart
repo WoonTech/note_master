@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:note_master/components/reminder.dart';
+import 'package:note_master/widgets/reminder.dart';
 import 'package:note_master/models/category.dart';
 import 'package:note_master/models/layout.dart';
 import 'package:note_master/models/repetition.dart';

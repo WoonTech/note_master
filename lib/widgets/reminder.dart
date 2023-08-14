@@ -6,13 +6,12 @@ import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:note_master/models/layout.dart';
 import 'package:note_master/models/notereminder.dart';
 import 'package:note_master/models/repetition.dart';
-import 'package:note_master/services/repetition_access.dart';
-import 'package:note_master/utils/dateUtils.dart';
+import 'package:note_master/utils/date_utils.dart';
 
 import '../models/styling.dart';
-import 'buttonbar.dart';
+import 'button_bar_widget.dart';
 import 'datepicker.dart';
-import 'dropdownlist.dart';
+import 'repetition_widget.dart';
 
 late NoteReminder tmpNoteReminder;
 
@@ -32,7 +31,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
     var reminderAt = widget.noteReminder.remindedAt.difference(DateTime.now());
     return Text(
       reminderAt > Duration.zero
-          ? 'reminder: ${reminderAt.toString().toValidDuration(reminderAt)}}'
+          ? 'reminder: ${reminderAt.toString().toValidDuration(reminderAt)}'
           : '',
       style: TextStyle(
         color: Font_Color_SUBDOMAIN,

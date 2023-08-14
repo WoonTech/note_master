@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:note_master/components/category.dart';
-import 'package:note_master/components/circularRadioButton.dart';
+import 'package:note_master/widgets/category_widget.dart';
 
 import '../models/layout.dart';
 

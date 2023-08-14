@@ -5,16 +5,15 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:note_master/models/noteheader.dart';
 import 'package:note_master/models/repetition.dart';
-import 'package:note_master/services/category_access.dart';
-import 'package:note_master/services/note_access.dart';
 
-import '../components/category.dart';
+import '../services/data_access.dart';
+import '../widgets/category_widget.dart';
 import 'category.dart';
 
 //Theme
 Color Theme_Color_ROOT = Colors.black;
-Color Theme_Color_DOMAIN = const Color.fromRGBO(233, 241, 245, 1);
-Color Theme_Color_SUBDOMAIN = const Color.fromRGBO(245, 245, 245, 1);
+Color Theme_Color_DOMAIN = const Color.fromRGBO(245, 245, 245, 1);
+Color Theme_Color_SUBDOMAIN = const Color.fromRGBO(233, 241, 245, 1);
 Color Theme_Color_SYSTEM = const Color.fromRGBO(37, 87, 218, 1);
 
 //Parameter
@@ -65,8 +64,8 @@ class LayoutDataProvider extends ChangeNotifier {
     switch (index) {
       case 0:
         Theme_Color_ROOT = Colors.black;
-        Theme_Color_DOMAIN = const Color.fromRGBO(233, 241, 245, 1);
-        Theme_Color_SUBDOMAIN = const Color.fromRGBO(245, 245, 245, 1);
+        Theme_Color_DOMAIN = const Color.fromRGBO(245, 245, 245, 1);
+        Theme_Color_SUBDOMAIN = const Color.fromRGBO(233, 241, 245, 1);
         Category = 0;
         break;
       case 1:

@@ -17,7 +17,7 @@ Color Category_Color_SELECTED = Colors.white;
 //Font
 Color Font_Color_Default = Colors.black;
 Color Font_Color_Content = const Color.fromRGBO(79, 84, 88, 1);
-Color Font_Color_UNSELECTED = const Color.fromRGBO(190, 186, 203, 1);
+Color Font_Color_UNSELECTED = Color.fromARGB(255, 152, 150, 150);
 Color Font_Color_SUBDOMAIN = const Color.fromRGBO(154, 155, 157, 1);
 Color Font_Color_DETAILS = const Color.fromRGBO(129, 135, 135, 1);
 Color Font_Color_TYPE = Colors.grey.shade400;
@@ -26,7 +26,8 @@ String Font_Family_LATO = 'Lato';
 double Font_Size_TITLE = 32;
 double Font_Size_HEADER = 20;
 double Font_Size_DIALOG = 15;
-
+double Font_Size_AppBar_Selected = 20;
+double Font_Size_AppBar_Unselected = 18;
 //Content
 double Expansion_Height_UNTAP = 50;
 double Expansion_Height_TAP = 107;
@@ -35,3 +36,6 @@ Color NotepadIcon_Color = Colors.black;
 
 //DateTime Format
 DateFormat formattedDate = DateFormat('d, MMM dd h:mm a');
+
+//Notification
+Color PopUpBox_Color = const Color.fromARGB(255, 229, 229, 229);

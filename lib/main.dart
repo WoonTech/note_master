@@ -1,17 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:note_master/models/repetition.dart';
-import 'package:note_master/pages/checklistpage.dart';
-import 'package:note_master/pages/homepage.dart';
+import 'package:note_master/pages/checklist_page.dart';
+import 'package:note_master/pages/home_page.dart';
 import 'package:note_master/pages/notepage.dart';
-import 'package:note_master/services/category_access.dart';
-import 'package:note_master/utils/dataAccess.dart';
+import 'package:note_master/services/data_access.dart';
 import 'package:provider/provider.dart';
 import 'constants/status.dart';
 import 'models/category.dart';
 import 'models/layout.dart';
 import 'models/styling.dart';
-import 'services/repetition_access.dart';
 
 int _current = 0;
 String _selectText = 'reminder: 5 days';
@@ -34,6 +32,7 @@ class MyApp extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const MaterialApp(
+            debugShowCheckedModeBanner: false,
             home: Scaffold(
               body: Center(
                 child: CircularProgressIndicator(),
@@ -42,6 +41,7 @@ class MyApp extends StatelessWidget {
           );
         } else if (snapshot.hasError) {
           return const MaterialApp(
+            debugShowCheckedModeBanner: false,
             home: Scaffold(
               body: Center(
                 child: Text('Error occurred while initializing data'),
@@ -50,6 +50,7 @@ class MyApp extends StatelessWidget {
           );
         } else {
           return MaterialApp(
+            debugShowCheckedModeBanner: false,
             home: Scaffold(
                 resizeToAvoidBottomInset: false,
                 body: ChangeNotifierProvider(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:note_master/components/reminder.dart';
+import 'package:note_master/widgets/reminder.dart';
 import 'package:note_master/models/category.dart';
 import 'package:note_master/models/noteheader.dart';
 import 'package:intl/intl.dart';
@@ -10,10 +10,12 @@ class CardWidget extends StatefulWidget {
   final LayoutDataProvider currentTheme;
   final double contentHeight;
   final NoteHeader note;
-  const CardWidget(
+  bool isHideContent;
+  CardWidget(
       {required this.note,
       required this.currentTheme,
       required this.contentHeight,
+      required this.isHideContent,
       super.key});
 
   @override
@@ -68,22 +70,12 @@ class _CardWidgetState extends State<CardWidget> {
                                 : Colors.transparent),
                       ],
                     ),
-                    const SizedBox(
-                      height: 15,
-                    ),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          widget.note.noteDetail!.content,
-                          maxLines: 3,
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              color: Font_Color_Content,
-                              fontSize: Font_Size_CONTENT,
-                              fontFamily: Font_Family_LATO,
-                              fontWeight: FontWeight.w500),
-                        ),
+                        widget.isHideContent
+                        ? Container()
+                        : ContentWidget(content: widget.note.noteDetail!.content),
                       ],
                     ),
                     const SizedBox(
@@ -108,5 +100,33 @@ class _CardWidgetState extends State<CardWidget> {
                 ),
               ),
             )));
+  }
+}
+
+class ContentWidget extends StatelessWidget {
+  final String content;
+  const ContentWidget({super.key, required this.content});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          const SizedBox(
+            height: 10,
+          ),
+          Text(
+            content,
+            maxLines: 3,
+            textAlign: TextAlign.left,
+            style: TextStyle(
+                color: Font_Color_Content,
+                fontSize: Font_Size_CONTENT,
+                fontFamily: Font_Family_LATO,
+                fontWeight: FontWeight.w500),
+          )
+        ],
+      ),
+    );
   }
 }

@@ -2,11 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:note_master/models/category.dart';
 import 'package:note_master/models/layout.dart';
-import 'package:note_master/services/category_access.dart';
 import 'package:provider/provider.dart';
 
 import '../models/notereminder.dart';
 import '../models/styling.dart';
+import '../pages/home_page.dart';
+import '../services/data_access.dart';
 
 class ButtonBarWidget extends StatefulWidget {
   NoteReminder? noteReminder;
@@ -78,6 +79,10 @@ class _ButtonBarWidgetState extends State<ButtonBarWidget> {
               ),
             ),
           ),
+          Container(
+            color: PopUpBox_Color,
+            child: const SizedBox(height: 20,width: 1,),
+          ),
           TextButton(
             onPressed: () {
               if (widget.noteReminder != null) {
@@ -96,6 +101,7 @@ class _ButtonBarWidgetState extends State<ButtonBarWidget> {
                     .whenComplete(() => setState(() {
                           widget.layoutDataProvider!
                               .removeCurrentCategoriesFromList(widget.noteCategoryToBeRemoved!);
+
                         }));
               }
               Navigator.of(context).pop();
