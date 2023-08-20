@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:note_master/widgets/category_widget.dart';
 import 'package:note_master/constants/status.dart';
 import 'package:provider/provider.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:vibration/vibration.dart';
 import '../models/styling.dart';
 import '../widgets/notecard_widget.dart';
@@ -17,6 +18,8 @@ late bool isHideContent;
 int currentCategoryID = 1;
 late List<NoteHeader> correspondingNotes;
 TextEditingController controller = TextEditingController();
+ItemScrollController categoryBarController = ItemScrollController();
+int selectedIndex = 0;
 List<String> dropdownList = ['Notes', 'reminder: 10 days', 'reminder: 20 days'];
 
 class HomePage extends StatefulWidget {
@@ -256,6 +259,44 @@ class _BodyWidgetState extends State<BodyWidget> {
       }
     });
   }
+  void _navigateToPreviousPage() {
+    selectedIndex--;
+    setState(() {
+      if(selectedIndex >= 0){
+        currentCategoryID = noteCategories[selectedIndex].id!;
+        //categoryBarController.jumpTo(index: selectedIndex);
+        categoryBarController.scrollTo(index: selectedIndex, duration: const Duration(milliseconds: 200));
+        widget.layoutData.setThemeStyle(
+              noteCategories[selectedIndex].colorId);
+      }
+    });
+  }
+
+  void _navigateToNextPage() {
+    selectedIndex++;
+    if (selectedIndex == noteCategories.length - 1) {
+      showDialog(
+          context: context,
+          builder: (context) =>
+              CategoryAlertBoxWidget(
+                layoutDataProvider:
+                    widget.layoutData,
+                categoryType: note_type,
+              )
+      );
+      selectedIndex--;
+    }
+    else{
+      setState(() {
+          if(selectedIndex <noteCategories.length - 1){
+            currentCategoryID = noteCategories[selectedIndex].id!;
+            categoryBarController.scrollTo(index: selectedIndex, duration: const Duration(milliseconds: 200));
+            widget.layoutData.setThemeStyle(
+                  noteCategories[selectedIndex].colorId);
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -305,14 +346,6 @@ class _BodyWidgetState extends State<BodyWidget> {
                             )
                           ),
                           const SizedBox(width: 5,),
-                          /*IconButton(
-                            onPressed: (){}, 
-                            padding: EdgeInsets.only(),
-                            constraints: BoxConstraints(),
-                            icon: const Icon(
-                              Icons.view_array
-                            )
-                          ),*/
                           Expanded(
                             child: Row(
                               children: const [
@@ -337,102 +370,117 @@ class _BodyWidgetState extends State<BodyWidget> {
                         margin: const EdgeInsets.only(left: 15, right: 15),
                         height: 28,
                         key: const Key('CategoriesBar'),
-                        child: ListView.builder(
-                            physics: const BouncingScrollPhysics(),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: noteCategories.length,
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                onLongPressStart: (details) {
-                                  Vibration.vibrate(duration: 100,amplitude: 50);
-                                    showDialog(
+                        child: ScrollablePositionedList.builder(
+                          //physics: const BouncingScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
+                          itemScrollController: categoryBarController,
+                          itemCount: noteCategories.length,
+                          itemBuilder: (context, index) {
+                            return GestureDetector(
+                              onLongPressStart: (details) {
+                                Vibration.vibrate(duration: 100,amplitude: 50);
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) =>
+                                        RemoveCategoryAlertBoxWidget(
+                                          category: noteCategories[selectedIndex],
+                                          layoutDataProvider:
+                                              widget.layoutData,
+                                        )
+                                  );
+                              },                             
+                              onTap: () {
+                                selectedIndex == index;
+                                if (selectedIndex == noteCategories.length - 1) {
+                                  showDialog(
                                       context: context,
                                       builder: (context) =>
-                                          RemoveCategoryAlertBoxWidget(
-                                            category: noteCategories[index],
+                                          CategoryAlertBoxWidget(
                                             layoutDataProvider:
                                                 widget.layoutData,
-                                          )
-                                    );
-                                },
-
-                                onTap: () {
-                                  if (index == noteCategories.length - 1) {
-                                    showDialog(
-                                        context: context,
-                                        builder: (context) =>
-                                            CategoryAlertBoxWidget(
-                                              layoutDataProvider:
-                                                  widget.layoutData,
-                                              categoryType: note_type,
-                                            ));
-                                  } else {
-                                    setState(() {
-                                      currentCategoryID = noteCategories[index].id!;
-                                      widget.layoutData.setThemeStyle(
-                                          noteCategories[index].colorId);
-                                    });
-                                  }
-                                },
-                                child: Container(
-                                  margin: const EdgeInsets.only(right: 10),
-                                  decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(15)),
-                                    border: currentCategoryID == noteCategories[index].id
-                                        ? Border.all(
-                                            color: widget.layoutData.theme
-                                                .Theme_Color_ROOT)
-                                        : Border.all(
-                                            color:
-                                                Category_BorderColor_DESELECTED),
-                                    color: currentCategoryID == noteCategories[index].id
-                                        ? Category_Color_SELECTED
-                                        : Category_Color_DESELECTED,
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 12, right: 10, top: 6, bottom: 6),
-                                    child: Text(noteCategories[index].name,
-                                        textAlign: TextAlign.justify,
-                                        style: TextStyle(
-                                            color: currentCategoryID == noteCategories[index].id
-                                                ? Font_Color_Default
-                                                : Font_Color_UNSELECTED,
-                                            fontSize: Font_Size_CONTENT,
-                                            fontFamily: Font_Family_LATO,
-                                            fontWeight: FontWeight.w500)),
+                                            categoryType: note_type,
+                                          ));
+                                } else {
+                                  setState(() {
+                                    currentCategoryID = noteCategories[index].id!;
+                                    widget.layoutData.setThemeStyle(
+                                        noteCategories[index].colorId);
+                                  });
+                                }
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.only(right: 10),
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(15)),
+                                  border: currentCategoryID == noteCategories[index].id
+                                      ? Border.all(
+                                          color: widget.layoutData.theme
+                                              .Theme_Color_ROOT)
+                                      : Border.all(
+                                          color:
+                                              Category_BorderColor_DESELECTED),
+                                  color: currentCategoryID == noteCategories[index].id
+                                      ? Category_Color_SELECTED
+                                      : Category_Color_DESELECTED,
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 12, right: 10, top: 6, bottom: 6),
+                                  child: Text(noteCategories[index].name,
+                                    textAlign: TextAlign.justify,
+                                    style: TextStyle(
+                                      color: currentCategoryID == noteCategories[index].id
+                                          ? Font_Color_Default
+                                          : Font_Color_UNSELECTED,
+                                      fontSize: Font_Size_CONTENT,
+                                      fontFamily: Font_Family_LATO,
+                                      fontWeight: FontWeight.w500
+                                    )
                                   ),
                                 ),
-                              );
-                            }),
+                              ),                               
+                            );
+                          }
+                        ),
                       ),
                       Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 15, right: 15),
-                          child: ListView.builder(
+                        child: GestureDetector(
+                          onHorizontalDragEnd: (details) {
+                            if (details.velocity.pixelsPerSecond.dx > 0) {
+                              _navigateToPreviousPage();
+                            } else if (details.velocity.pixelsPerSecond.dx < 0) {
+                              _navigateToNextPage();
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 15, right: 15),
+                            child: ListView.builder(
                               physics: const BouncingScrollPhysics(),
                               scrollDirection: Axis.vertical,
                               itemCount: correspondingNotes.length,
                               itemBuilder: (context, index) {
                                 return GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => NotePage(
-                                                  layoutData: widget.layoutData,
-                                                  cardNote: correspondingNotes
-                                                      .elementAt(index))));
-                                    },
-                                    child: CardWidget(
-                                      note: correspondingNotes.elementAt(index),
-                                      currentTheme: widget.layoutData,
-                                      contentHeight: _contentHeight,
-                                      isHideContent: isHideContent,
-                                    ));
-                              }),
-                        ),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => NotePage(
+                                              layoutData: widget.layoutData,
+                                              cardNote: correspondingNotes
+                                                  .elementAt(index))));
+                                  },
+                                  child: CardWidget(
+                                    note: correspondingNotes.elementAt(index),
+                                    currentTheme: widget.layoutData,
+                                    contentHeight: _contentHeight,
+                                    isHideContent: isHideContent,
+                                  )
+                                );
+                              }
+                            ),
+                          ),
+                        ) 
                       )
                     ],
                   ))),

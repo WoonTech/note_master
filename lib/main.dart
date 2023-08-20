@@ -175,6 +175,13 @@ class _SwipeNavigationState extends State<SwipeNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      body: HomePage()
+    );
+  }
+
+  /*@override
+  Widget build(BuildContext context) {
+    return Scaffold(
       body: GestureDetector(
         onHorizontalDragEnd: (details) {
           if (details.velocity.pixelsPerSecond.dx > 0) {
@@ -190,5 +197,5 @@ class _SwipeNavigationState extends State<SwipeNavigation> {
         ),
       ),
     );
-  }
+  }*/
 }
