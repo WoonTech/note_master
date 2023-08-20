@@ -260,7 +260,9 @@ class _BodyWidgetState extends State<BodyWidget> {
     });
   }
   void _navigateToPreviousPage() {
-    selectedIndex--;
+    if(selectedIndex > 0){
+      selectedIndex--;
+    }
     setState(() {
       if(selectedIndex >= 0){
         currentCategoryID = noteCategories[selectedIndex].id!;
@@ -340,8 +342,8 @@ class _BodyWidgetState extends State<BodyWidget> {
                             constraints: BoxConstraints(), 
                             icon: Icon(
                               isHideContent
-                              ? Icons.remove_red_eye
-                              : Icons.remove_red_eye_rounded,
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                               color: Font_Color_UNSELECTED,
                             )
                           ),
