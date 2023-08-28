@@ -28,6 +28,9 @@ double Font_Size_HEADER = 20;
 double Font_Size_DIALOG = 15;
 double Font_Size_AppBar_Selected = 20;
 double Font_Size_AppBar_Unselected = 18;
+//Icons
+Color Icon_Color_Close = const Color.fromARGB(255, 152, 150, 150);
+Color Icon_Color_Pinned = const Color.fromRGBO(252, 196, 25, 1);
 //Content
 double Expansion_Height_UNTAP = 50;
 double Expansion_Height_TAP = 107;

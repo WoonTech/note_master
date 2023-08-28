@@ -178,7 +178,7 @@ class _NotePageState extends State<NotePage> {
                   icon: Icon(
                     Icons.star,
                     color: currentNote!.isPinned
-                        ? const Color.fromRGBO(252, 196, 25, 1)
+                        ? Icon_Color_Pinned
                         : NotepadIcon_Color,
                   )),
             ),
