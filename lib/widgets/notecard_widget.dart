@@ -32,10 +32,10 @@ class _NoteCardHolderWidgetState extends State<NoteCardHolderWidget> {
   Offset childOffset = Offset(0, 0);
   late Size childSize;
   late Widget cardWidget;
+  late Widget notePageWidget;
   @override
   void initState() {
     super.initState();
-    cardWidget = getCard();
   }
 
   getOffset() {
@@ -59,6 +59,9 @@ class _NoteCardHolderWidgetState extends State<NoteCardHolderWidget> {
 
   @override
   Widget build(BuildContext context) {
+    cardWidget = getCard();
+    notePageWidget =
+        NotePage(layoutData: widget.currentTheme, cardNote: widget.note);
     return GestureDetector(
         key: containerKey,
         onLongPress: () async {
@@ -72,10 +75,10 @@ class _NoteCardHolderWidgetState extends State<NoteCardHolderWidget> {
                     return FadeTransition(
                       opacity: animation,
                       child: NoteCardDetailWidget(
-                        menuContent: ,
                         childOffset: childOffset,
                         childSize: childSize,
                         child: cardWidget,
+                        notePage: notePageWidget,
                       ),
                     );
                   },
@@ -84,10 +87,7 @@ class _NoteCardHolderWidgetState extends State<NoteCardHolderWidget> {
         },
         onTap: () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => NotePage(
-                      layoutData: widget.currentTheme, cardNote: widget.note)));
+              context, MaterialPageRoute(builder: (context) => notePageWidget));
         },
         child: cardWidget);
   }
@@ -129,6 +129,7 @@ class _CardWidgetState extends State<CardWidget> {
             borderRadius: BorderRadius.circular(10),
             child: Container(
               decoration: BoxDecoration(
+                  color: Primary_Color,
                   border: Border(
                       left: BorderSide(
                           color: rootColors[noteCategories
@@ -161,7 +162,9 @@ class _CardWidgetState extends State<CardWidget> {
                         const Expanded(child: SizedBox()),
                         Icon(
                           Icons.star,
-                          color: Icon_Color_Pinned,
+                          color: widget.note.isPinned
+                              ? Icon_Color_Pinned
+                              : Colors.transparent,
                         )
                       ],
                     ),

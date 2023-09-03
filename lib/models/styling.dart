@@ -7,8 +7,10 @@ import 'package:note_master/models/layout.dart';
 ThemeData appThemeLight =
     ThemeData.light().copyWith(primaryColor: Theme_Color_DOMAIN);
 ThemeData appThemeDark = ThemeData.dark().copyWith(
-  primaryColor: Colors.white,
+  primaryColor: Primary_Color,
 );
+//Them
+Color Primary_Color = Colors.white;
 //Category
 Color Category_BorderColor_DESELECTED = const Color.fromRGBO(228, 236, 240, 1);
 Color Category_Color_DESELECTED = const Color.fromRGBO(246, 250, 252, 1);

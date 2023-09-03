@@ -183,7 +183,6 @@ Future<List<NoteCategory>> getCategoriesAsync() async {
   String getCategoriesQuery = 'Select * from NoteCategory  where Status = ?';
   var db = (await database);
   var results = await db.rawQuery(getCategoriesQuery, [activeStatus]);
-  print(results.toString());
   try {
     return List.generate(results.length, (index) {
       return NoteCategory.fromJson(results[index]);
@@ -221,8 +220,8 @@ Future deleteCategoryAsync(NoteCategory category) async {
   var db = (await database);
   try {
     await db.transaction((txn) async {
-      await txn
-          .update('NoteCategory',{ 'Status': inactiveStatus}, where: 'ID = ?', whereArgs: [category.id]);
+      await txn.update('NoteCategory', {'Status': inactiveStatus},
+          where: 'ID = ?', whereArgs: [category.id]);
       await txn.update(
           'NoteHeader',
           {

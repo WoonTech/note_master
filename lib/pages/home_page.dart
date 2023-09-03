@@ -276,7 +276,10 @@ class _BodyWidgetState extends State<BodyWidget> {
   }
 
   void _navigateToNextPage() {
-    selectedIndex++;
+    if (selectedIndex < noteCategories.length - 1) {
+      selectedIndex++;
+    }
+
     if (selectedIndex == noteCategories.length - 1) {
       showDialog(
           context: context,
@@ -400,9 +403,11 @@ class _BodyWidgetState extends State<BodyWidget> {
                                           ));
                                 },
                                 onTap: () {
-                                  selectedIndex == index;
+                                  var originalIndex = selectedIndex;
+                                  selectedIndex = index;
                                   if (selectedIndex ==
                                       noteCategories.length - 1) {
+                                    selectedIndex = originalIndex;
                                     showDialog(
                                         context: context,
                                         builder: (context) =>

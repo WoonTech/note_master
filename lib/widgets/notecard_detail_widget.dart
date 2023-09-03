@@ -3,18 +3,20 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:note_master/models/styling.dart';
+import 'package:note_master/widgets/popup_note_widget.dart';
 
 class NoteCardDetailWidget extends StatefulWidget {
   final Offset childOffset;
   final Size childSize;
-  final Widget child, menuContent;
-
+  final Widget child;
+  final Widget notePage;
   const NoteCardDetailWidget(
       {super.key,
       required this.childOffset,
       required this.childSize,
       required this.child,
-      required this.menuContent});
+      required this.notePage});
 
   @override
   State<NoteCardDetailWidget> createState() => _NoteCardDetailWidgetState();
@@ -24,16 +26,15 @@ class _NoteCardDetailWidgetState extends State<NoteCardDetailWidget> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    final maxMenuWidth = size.width * 0.70;
-    final menuHeight = size.height * 0.35;
-    final leftOffset = (widget.childOffset.dx + maxMenuWidth) < size.width
-        ? widget.childOffset.dx
-        : (widget.childOffset.dx - maxMenuWidth + widget.childSize.width);
+    final maxMenuWidth = size.width * 0.42;
+    final maxMenuHeight = size.height * 0.1;
+    final rightOffset = widget.childOffset.dx +
+        3; // somehow the card widget has a default padding value of 3
     final topOffset =
-        (widget.childOffset.dy + menuHeight + widget.childSize.height) <
+        (widget.childOffset.dy + maxMenuHeight + widget.childSize.height) <
                 size.height
             ? widget.childOffset.dy + widget.childSize.height
-            : widget.childOffset.dy - menuHeight;
+            : widget.childOffset.dy - maxMenuHeight;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
@@ -52,6 +53,9 @@ class _NoteCardDetailWidgetState extends State<NoteCardDetailWidget> {
               ),
             ),
             Positioned(
+                top: topOffset,
+                //left: leftOffset,
+                right: rightOffset,
                 child: TweenAnimationBuilder(
                     tween: Tween(begin: 0.0, end: 1.0),
                     duration: Duration(milliseconds: 200),
@@ -64,11 +68,11 @@ class _NoteCardDetailWidgetState extends State<NoteCardDetailWidget> {
                     },
                     child: Container(
                       width: maxMenuWidth,
-                      height: menuHeight,
+                      height: maxMenuHeight,
                       decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
+                          color: Primary_Color,
                           borderRadius:
-                              const BorderRadius.all(Radius.circular(5.0)),
+                              const BorderRadius.all(Radius.circular(10.0)),
                           boxShadow: const [
                             BoxShadow(
                                 color: Colors.black38,
@@ -76,9 +80,8 @@ class _NoteCardDetailWidgetState extends State<NoteCardDetailWidget> {
                                 spreadRadius: 1),
                           ]),
                       child: ClipRRect(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(5.0)),
-                        child: widget.menuContent,
+                        child: PopUpMenuNoteWidget(
+                            notePageWidget: widget.notePage),
                       ),
                     ))),
             Positioned(
