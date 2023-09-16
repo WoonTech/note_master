@@ -106,6 +106,11 @@ class LayoutDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void removeCurrentNoteToList(int noteId) {
+    notes.remove(noteId);
+    notifyListeners();
+  }
+
   void addLatestCategoriesToList(NoteCategory noteCategory) {
     noteCategories.insert(noteCategories.length - 1, noteCategory);
     notifyListeners();

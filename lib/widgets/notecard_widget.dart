@@ -14,6 +14,7 @@ class NoteCardHolderWidget extends StatefulWidget {
   final LayoutDataProvider currentTheme;
   final double contentHeight;
   final NoteHeader note;
+  final int index;
   bool isHideContent;
 
   NoteCardHolderWidget(
@@ -21,6 +22,7 @@ class NoteCardHolderWidget extends StatefulWidget {
       required this.currentTheme,
       required this.contentHeight,
       required this.isHideContent,
+      required this.index,
       super.key});
 
   @override
@@ -51,10 +53,12 @@ class _NoteCardHolderWidgetState extends State<NoteCardHolderWidget> {
 
   Widget getCard() {
     return CardWidget(
-        note: widget.note,
-        currentTheme: widget.currentTheme,
-        contentHeight: widget.contentHeight,
-        isHideContent: widget.isHideContent);
+      note: widget.note,
+      currentTheme: widget.currentTheme,
+      contentHeight: widget.contentHeight,
+      isHideContent: widget.isHideContent,
+      index: widget.index,
+    );
   }
 
   @override
@@ -79,6 +83,8 @@ class _NoteCardHolderWidgetState extends State<NoteCardHolderWidget> {
                         childSize: childSize,
                         child: cardWidget,
                         notePage: notePageWidget,
+                        note: widget.note,
+                        layoutDataProvider: widget.currentTheme,
                       ),
                     );
                   },
@@ -97,13 +103,14 @@ class CardWidget extends StatefulWidget {
   final LayoutDataProvider currentTheme;
   final double contentHeight;
   final NoteHeader note;
-
+  final int index;
   bool isHideContent;
   CardWidget(
       {required this.note,
       required this.currentTheme,
       required this.contentHeight,
       required this.isHideContent,
+      required this.index,
       super.key});
 
   @override
@@ -111,94 +118,106 @@ class CardWidget extends StatefulWidget {
 }
 
 class _CardWidgetState extends State<CardWidget> {
+  bool startAnimation = false;
   GlobalKey containerKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      setState(() {
+        startAnimation = true;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        elevation: 2,
-        child: ClipRRect(
+    return AnimatedContainer(
+      key: Key(widget.index.toString()),
+      duration: Duration(milliseconds: 300 + (widget.index * 100)),
+      transform: Matrix4.translationValues(startAnimation ? 0 : 300, 0, 0),
+      curve: Curves.easeInOut,
+      child: Card(
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: Primary_Color,
-                  border: Border(
-                      left: BorderSide(
-                          color: rootColors[noteCategories
-                              .where((element) =>
-                                  element.id ==
-                                  (widget.note.categoryId ??
-                                      category_default_ID))
-                              .first
-                              .colorId],
-                          width: 7))),
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 10, right: 10, top: 10, bottom: 5),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  //crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          widget.note.title.toString(),
-                          maxLines: 1,
-                          style: TextStyle(
-                            fontFamily: Font_Family_LATO,
-                            fontSize: Font_Size_HEADER,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black,
+          ),
+          elevation: 2,
+          child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                decoration: BoxDecoration(
+                    color: Primary_Color,
+                    border: Border(
+                        left: BorderSide(
+                            color: rootColors[noteCategories
+                                .where((element) =>
+                                    element.id ==
+                                    (widget.note.categoryId ??
+                                        category_default_ID))
+                                .first
+                                .colorId],
+                            width: 7))),
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      left: 10, right: 10, top: 10, bottom: 5),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    //crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            widget.note.title.toString(),
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontFamily: Font_Family_LATO,
+                              fontSize: Font_Size_HEADER,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black,
+                            ),
                           ),
-                        ),
-                        const Expanded(child: SizedBox()),
-                        Icon(
-                          Icons.star,
-                          color: widget.note.isPinned
-                              ? Icon_Color_Pinned
-                              : Colors.transparent,
-                        )
-                      ],
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        widget.isHideContent
-                            ? Container()
-                            : ContentWidget(
-                                content: widget.note.noteDetail!.content),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          formattedDate.format(widget.note.createdAt),
-                          style: TextStyle(
-                              color: Font_Color_SUBDOMAIN,
-                              fontSize: Font_Size_CONTENT,
-                              fontFamily: Font_Family_LATO),
-                        ),
-                        const Expanded(child: SizedBox()),
-                        NotificationWidget(
-                            noteReminder: widget.note.noteReminder!)
-                      ],
-                    ),
-                  ],
+                          const Expanded(child: SizedBox()),
+                          Icon(
+                            Icons.star,
+                            color: widget.note.isPinned
+                                ? Icon_Color_Pinned
+                                : Colors.transparent,
+                          )
+                        ],
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          widget.isHideContent
+                              ? Container()
+                              : ContentWidget(
+                                  content: widget.note.noteDetail!.content),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            formattedDate.format(widget.note.createdAt),
+                            style: TextStyle(
+                                color: Font_Color_SUBDOMAIN,
+                                fontSize: Font_Size_CONTENT,
+                                fontFamily: Font_Family_LATO),
+                          ),
+                          const Expanded(child: SizedBox()),
+                          NotificationWidget(
+                              noteReminder: widget.note.noteReminder!)
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            )));
+              ))),
+    );
   }
 }
 

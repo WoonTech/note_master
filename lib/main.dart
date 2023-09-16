@@ -174,9 +174,7 @@ class _SwipeNavigationState extends State<SwipeNavigation> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: HomePage()
-    );
+    return Scaffold(body: HomePage());
   }
 
   /*@override

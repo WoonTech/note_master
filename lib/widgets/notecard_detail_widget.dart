@@ -3,20 +3,27 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:note_master/models/noteheader.dart';
 import 'package:note_master/models/styling.dart';
 import 'package:note_master/widgets/popup_note_widget.dart';
+
+import '../models/layout.dart';
 
 class NoteCardDetailWidget extends StatefulWidget {
   final Offset childOffset;
   final Size childSize;
   final Widget child;
   final Widget notePage;
+  final NoteHeader note;
+  final LayoutDataProvider layoutDataProvider;
   const NoteCardDetailWidget(
       {super.key,
       required this.childOffset,
       required this.childSize,
       required this.child,
-      required this.notePage});
+      required this.notePage,
+      required this.note,
+      required this.layoutDataProvider});
 
   @override
   State<NoteCardDetailWidget> createState() => _NoteCardDetailWidgetState();
@@ -48,7 +55,7 @@ class _NoteCardDetailWidgetState extends State<NoteCardDetailWidget> {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaY: 4, sigmaX: 4),
                 child: Container(
-                  color: Colors.black.withOpacity(0.7),
+                  color: Colors.black.withOpacity(0.3),
                 ),
               ),
             ),
@@ -58,7 +65,7 @@ class _NoteCardDetailWidgetState extends State<NoteCardDetailWidget> {
                 right: rightOffset,
                 child: TweenAnimationBuilder(
                     tween: Tween(begin: 0.0, end: 1.0),
-                    duration: Duration(milliseconds: 200),
+                    duration: Duration(milliseconds: 150),
                     builder: (BuildContext context, value, Widget? child) {
                       return Transform.scale(
                         scale: value,
@@ -81,7 +88,10 @@ class _NoteCardDetailWidgetState extends State<NoteCardDetailWidget> {
                           ]),
                       child: ClipRRect(
                         child: PopUpMenuNoteWidget(
-                            notePageWidget: widget.notePage),
+                          notePageWidget: widget.notePage,
+                          note: widget.note,
+                          layoutData: widget.layoutDataProvider,
+                        ),
                       ),
                     ))),
             Positioned(

@@ -437,7 +437,7 @@ Future<NoteHeader> patchNoteAsync(NoteHeader note) async {
   }
 }
 
-Future deleteNote(int noteId) async {
+Future deleteNoteAsync(int noteId) async {
   DateTime updatedAt = DateTime.now();
   var db = (await database);
   try {

@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
 
+import '../models/layout.dart';
+import '../models/noteheader.dart';
+import '../services/data_access.dart';
+
 class PopUpMenuNoteWidget extends StatefulWidget {
   final Widget notePageWidget;
-  const PopUpMenuNoteWidget({required this.notePageWidget, super.key});
+  final NoteHeader note;
+  final LayoutDataProvider layoutData;
+  const PopUpMenuNoteWidget(
+      {required this.notePageWidget,
+      required this.note,
+      required this.layoutData,
+      super.key});
 
   @override
   State<PopUpMenuNoteWidget> createState() => _PopUpMenuNoteWidgetState();
@@ -31,17 +41,15 @@ class _PopUpMenuNoteWidgetState extends State<PopUpMenuNoteWidget> {
             height: maxMenuHeight / 2,
             child: TextButton.icon(
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => widget.notePageWidget));
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => widget.notePageWidget));
                 },
-                icon: Icon(
+                icon: const Icon(
                   Icons.edit_note,
                   color: Colors.black,
                   size: 20,
                 ),
-                label: Align(
+                label: const Align(
                   alignment: Alignment.centerLeft,
                   child: Text('Edit Note'),
                 )),
@@ -51,7 +59,13 @@ class _PopUpMenuNoteWidgetState extends State<PopUpMenuNoteWidget> {
             height: maxMenuHeight / 2,
             child: TextButton.icon(
                 onPressed: () {
-                  setState(() {});
+                  deleteNoteAsync(widget.note.id!).whenComplete(() {
+                    setState(() {
+                      widget.layoutData
+                          .removeCurrentNoteToList(widget.note.id!);
+                      Navigator.pop(context);
+                    });
+                  });
                 },
                 icon: Icon(
                   Icons.delete,

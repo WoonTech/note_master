@@ -198,13 +198,34 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                           ),
                                         ),
-                                        Container(
-                                            padding: EdgeInsets.only(right: 10),
-                                            child: const Icon(
-                                              Icons.search,
-                                              color: Colors.black,
-                                              size: 20,
-                                            ))
+                                        AnimatedSwitcher(
+                                            duration: const Duration(
+                                                milliseconds: 200),
+                                            transitionBuilder: (Widget child,
+                                                Animation<double> animation) {
+                                              return ScaleTransition(
+                                                  scale: animation,
+                                                  child: child);
+                                            },
+                                            child: controller.text.isEmpty
+                                                ? Container(
+                                                    key: Key('search'),
+                                                    padding: EdgeInsets.only(
+                                                        right: 10),
+                                                    child: Icon(
+                                                      Icons.search,
+                                                      color: Colors.black,
+                                                      size: 20,
+                                                    ))
+                                                : Container(
+                                                    key: Key('close'),
+                                                    padding: EdgeInsets.only(
+                                                        right: 10),
+                                                    child: const Icon(
+                                                      Icons.close,
+                                                      color: Colors.black,
+                                                      size: 20,
+                                                    )))
                                       ],
                                     ))))
                       ],
@@ -474,14 +495,18 @@ class _BodyWidgetState extends State<BodyWidget> {
                           padding: const EdgeInsets.only(left: 15, right: 15),
                           child: ListView.builder(
                               physics: const BouncingScrollPhysics(),
+                              primary: false,
+                              shrinkWrap: true,
                               scrollDirection: Axis.vertical,
                               itemCount: correspondingNotes.length,
                               itemBuilder: (context, index) {
                                 return NoteCardHolderWidget(
-                                    note: correspondingNotes.elementAt(index),
-                                    currentTheme: widget.layoutData,
-                                    contentHeight: _contentHeight,
-                                    isHideContent: isHideContent);
+                                  note: correspondingNotes.elementAt(index),
+                                  currentTheme: widget.layoutData,
+                                  contentHeight: _contentHeight,
+                                  isHideContent: isHideContent,
+                                  index: index,
+                                );
                               }),
                         ),
                       ))
