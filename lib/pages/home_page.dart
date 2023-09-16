@@ -207,25 +207,42 @@ class _HomePageState extends State<HomePage> {
                                                   scale: animation,
                                                   child: child);
                                             },
-                                            child: controller.text.isEmpty
-                                                ? Container(
-                                                    key: Key('search'),
-                                                    padding: EdgeInsets.only(
-                                                        right: 10),
-                                                    child: Icon(
-                                                      Icons.search,
-                                                      color: Colors.black,
-                                                      size: 20,
-                                                    ))
-                                                : Container(
-                                                    key: Key('close'),
-                                                    padding: EdgeInsets.only(
-                                                        right: 10),
-                                                    child: const Icon(
-                                                      Icons.close,
-                                                      color: Colors.black,
-                                                      size: 20,
-                                                    )))
+                                            child: Padding(
+                                              padding:
+                                                  EdgeInsets.only(right: 10),
+                                              child: controller.text.isEmpty
+                                                  ? SizedBox(
+                                                      key: Key('search'),
+                                                      height: 20,
+                                                      width: 20,
+                                                      child: IconButton(
+                                                          padding:
+                                                              EdgeInsets.all(0),
+                                                          onPressed: () {},
+                                                          icon: Icon(
+                                                            Icons.search,
+                                                            color: Colors.black,
+                                                            size: 20,
+                                                          )))
+                                                  : SizedBox(
+                                                      key: Key('close'),
+                                                      height: 20,
+                                                      width: 20,
+                                                      child: IconButton(
+                                                          padding:
+                                                              EdgeInsets.all(0),
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              controller.text =
+                                                                  '';
+                                                            });
+                                                          },
+                                                          icon: Icon(
+                                                            Icons.close,
+                                                            color: Colors.black,
+                                                            size: 20,
+                                                          ))),
+                                            ))
                                       ],
                                     ))))
                       ],
