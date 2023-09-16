@@ -133,10 +133,12 @@ class _CardWidgetState extends State<CardWidget> {
 
   @override
   Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
     return AnimatedContainer(
       key: Key(widget.index.toString()),
       duration: Duration(milliseconds: 300 + (widget.index * 100)),
-      transform: Matrix4.translationValues(startAnimation ? 0 : 300, 0, 0),
+      transform:
+          Matrix4.translationValues(startAnimation ? 0 : screenWidth, 0, 0),
       curve: Curves.easeInOut,
       child: Card(
           shape: RoundedRectangleBorder(
