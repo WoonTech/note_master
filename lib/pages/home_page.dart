@@ -523,6 +523,8 @@ class _BodyWidgetState extends State<BodyWidget> {
                                   contentHeight: _contentHeight,
                                   isHideContent: isHideContent,
                                   index: index,
+                                  textEditingController: controller,
+                                  key: UniqueKey(),
                                 );
                               }),
                         ),

@@ -15,6 +15,7 @@ class NoteCardHolderWidget extends StatefulWidget {
   final double contentHeight;
   final NoteHeader note;
   final int index;
+  final TextEditingController textEditingController;
   bool isHideContent;
 
   NoteCardHolderWidget(
@@ -23,6 +24,7 @@ class NoteCardHolderWidget extends StatefulWidget {
       required this.contentHeight,
       required this.isHideContent,
       required this.index,
+      required this.textEditingController,
       super.key});
 
   @override
@@ -58,6 +60,7 @@ class _NoteCardHolderWidgetState extends State<NoteCardHolderWidget> {
       contentHeight: widget.contentHeight,
       isHideContent: widget.isHideContent,
       index: widget.index,
+      textEditingController: widget.textEditingController,
     );
   }
 
@@ -104,6 +107,8 @@ class CardWidget extends StatefulWidget {
   final double contentHeight;
   final NoteHeader note;
   final int index;
+  final TextEditingController textEditingController;
+
   bool isHideContent;
   CardWidget(
       {required this.note,
@@ -111,6 +116,7 @@ class CardWidget extends StatefulWidget {
       required this.contentHeight,
       required this.isHideContent,
       required this.index,
+      required this.textEditingController,
       super.key});
 
   @override
@@ -119,7 +125,6 @@ class CardWidget extends StatefulWidget {
 
 class _CardWidgetState extends State<CardWidget> {
   bool startAnimation = false;
-  GlobalKey containerKey = GlobalKey();
 
   @override
   void initState() {
@@ -135,7 +140,7 @@ class _CardWidgetState extends State<CardWidget> {
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
     return AnimatedContainer(
-      key: Key(widget.index.toString()),
+      key: widget.key,
       duration: Duration(milliseconds: 300 + (widget.index * 100)),
       transform:
           Matrix4.translationValues(startAnimation ? 0 : screenWidth, 0, 0),

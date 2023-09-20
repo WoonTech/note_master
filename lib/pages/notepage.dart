@@ -112,15 +112,20 @@ class _NotePageState extends State<NotePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        //resizeToAvoidBottomInset: false,
         appBar: AppBar(
           backgroundColor: Notepad_Color,
           shadowColor: Colors.transparent,
           leading: Container(
             margin: const EdgeInsets.only(left: 20),
             child: IconButton(
-                onPressed: () {
-                  FocusScope.of(context).requestFocus(FocusNode());
-                  Navigator.pop(context);
+                onPressed: () async {
+                  FocusScope.of(context).unfocus();
+                  await Future.delayed(const Duration(milliseconds: 100));
+                  Navigator.of(context).pop();
+                  setState(() {
+                    widget.layoutData!.refreshHomePage();
+                  });
                 },
                 icon: Icon(
                   Icons.arrow_back_ios,

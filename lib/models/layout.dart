@@ -116,6 +116,10 @@ class LayoutDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void refreshHomePage() {
+    notifyListeners();
+  }
+
   void removeCurrentCategoriesFromList(NoteCategory noteCategory) {
     noteCategories.removeWhere((element) => element.id == noteCategory.id);
     notes.values
