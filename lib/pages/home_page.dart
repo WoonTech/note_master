@@ -394,7 +394,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                                 isHideContent
                                     ? Icons.visibility_off
                                     : Icons.visibility,
-                                color: Font_Color_UNSELECTED,
+                                color: Icon_Visbility_Color,
                               )),
                           const SizedBox(
                             width: 5,

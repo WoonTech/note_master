@@ -79,13 +79,23 @@ class _NotePageState extends State<NotePage> {
   }
 
   String updateTitle(String title) {
-    List<String> words = title.split(' ');
+    List<String> words = title.split(RegExp(r'[\s\n]+'));
     if (words.length >= 2) {
       return words.take(2).join(' ');
     } else if (words.isNotEmpty) {
       return words.first;
     }
     return '';
+  }
+
+  bool IsContentAndTitleEmpty(String title, String content) {
+    if (title.isNotEmpty) {
+      return false;
+    }
+    if (content.isNotEmpty) {
+      return false;
+    }
+    return true;
   }
 
   NoteHeader ToNote() {
@@ -123,13 +133,10 @@ class _NotePageState extends State<NotePage> {
                   FocusScope.of(context).unfocus();
                   await Future.delayed(const Duration(milliseconds: 100));
                   Navigator.of(context).pop();
-                  setState(() {
-                    widget.layoutData!.refreshHomePage();
-                  });
                 },
                 icon: Icon(
                   Icons.arrow_back_ios,
-                  color: NotepadIcon_Color,
+                  color: Icon_Active_Color,
                 )),
           ),
           actions: [
@@ -184,7 +191,7 @@ class _NotePageState extends State<NotePage> {
                     Icons.star,
                     color: currentNote!.isPinned
                         ? Icon_Color_Pinned
-                        : NotepadIcon_Color,
+                        : Icon_Active_Color,
                   )),
             ),
             Container(
@@ -201,7 +208,7 @@ class _NotePageState extends State<NotePage> {
                     Icons.notifications,
                     color: isReminderOver(currentNote!.noteReminder!.remindedAt)
                         ? const Color.fromRGBO(37, 87, 218, 1)
-                        : NotepadIcon_Color,
+                        : Icon_Active_Color,
                   )),
             ),
             Container(
@@ -225,10 +232,12 @@ class _NotePageState extends State<NotePage> {
                       Fluttertoast.showToast(msg: "Note saved successfully!");
                     });
                   },
-                  icon: Icon(
-                    Icons.check,
-                    color: NotepadIcon_Color,
-                  )),
+                  icon: Icon(Icons.check,
+                      color: IsContentAndTitleEmpty(
+                              titleTextEditingController.text,
+                              contentTextEditingController.text)
+                          ? Icon_Inactive_Color
+                          : Icon_Active_Color)),
             ),
           ],
         ),
@@ -263,6 +272,9 @@ class _NotePageState extends State<NotePage> {
                             fontSize: Font_Size_TITLE,
                             fontWeight: FontWeight.bold),
                         textAlign: TextAlign.left,
+                        onChanged: (value) {
+                          setState(() {});
+                        },
                       ),
                       const SizedBox(
                         height: 15,
@@ -279,38 +291,25 @@ class _NotePageState extends State<NotePage> {
                         height: 35,
                       ),
                       Expanded(
-                        child: NotePad(
-                          textEditingController: contentTextEditingController,
+                          child: TextField(
+                        maxLines: null,
+                        autofocus: contentTextEditingController.text == ""
+                            ? true
+                            : false,
+                        controller: contentTextEditingController,
+                        keyboardType: TextInputType.multiline,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
                         ),
-                      ),
+                        onChanged: (value) {
+                          setState(() {});
+                        },
+                      )),
                       const SizedBox(
                         height: 10,
                       ),
                     ],
                   ),
                 ))));
-  }
-}
-
-class NotePad extends StatefulWidget {
-  final TextEditingController textEditingController;
-  const NotePad({required this.textEditingController, super.key});
-
-  @override
-  State<NotePad> createState() => _NotePadState();
-}
-
-class _NotePadState extends State<NotePad> {
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      maxLines: null,
-      autofocus: widget.textEditingController.text == "" ? true : false,
-      controller: widget.textEditingController,
-      keyboardType: TextInputType.multiline,
-      decoration: const InputDecoration(
-        border: InputBorder.none,
-      ),
-    );
   }
 }

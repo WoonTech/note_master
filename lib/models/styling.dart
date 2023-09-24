@@ -33,11 +33,14 @@ double Font_Size_AppBar_Unselected = 18;
 //Icons
 Color Icon_Color_Close = const Color.fromARGB(255, 152, 150, 150);
 Color Icon_Color_Pinned = const Color.fromRGBO(252, 196, 25, 1);
+Color Icon_Inactive_Color = Color.fromARGB(255, 152, 150, 150);
+Color Icon_Visbility_Color = Color.fromARGB(255, 152, 150, 150);
+Color Icon_Active_Color = Colors.black;
+
 //Content
 double Expansion_Height_UNTAP = 50;
 double Expansion_Height_TAP = 107;
 Color Notepad_Color = const Color.fromRGBO(245, 245, 245, 1);
-Color NotepadIcon_Color = Colors.black;
 
 //DateTime Format
 DateFormat formattedDate = DateFormat('d, MMM dd h:mm a');

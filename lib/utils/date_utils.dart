@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
 
+extension StringClean on String {
+  String cleanString() {
+    var cleanedString = replaceAll(RegExp(r'^[\s\n]+'), '');
+    cleanedString = cleanedString.replaceAll(RegExp(r'\n\s*'), ' ');
+    return cleanedString;
+  }
+}
+
 extension StringExtension on String {
   String toValidDuration(Duration duration) {
     String reminder = '';

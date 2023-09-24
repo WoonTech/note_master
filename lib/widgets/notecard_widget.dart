@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:note_master/utils/date_utils.dart';
 import 'package:note_master/widgets/reminder.dart';
 import 'package:note_master/models/category.dart';
 import 'package:note_master/models/noteheader.dart';
@@ -244,7 +245,8 @@ class ContentWidget extends StatelessWidget {
             height: 10,
           ),
           SubstringHighlight(
-            text: content, // search result string from database or something
+            text: content
+                .cleanString(), // search result string from database or something
             term: textEditingController.text, // user typed "et"
             maxLines: 3,
             textStyle: TextStyle(
