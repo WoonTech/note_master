@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import '../models/layout.dart';
 import '../models/styling.dart';
 import '../pages/notepage.dart';
+import 'substring_highlighted_widget.dart';
 import 'notecard_detail_widget.dart';
 
 class NoteCardHolderWidget extends StatefulWidget {
@@ -17,7 +18,6 @@ class NoteCardHolderWidget extends StatefulWidget {
   final int index;
   final TextEditingController textEditingController;
   bool isHideContent;
-
   NoteCardHolderWidget(
       {required this.note,
       required this.currentTheme,
@@ -108,7 +108,6 @@ class CardWidget extends StatefulWidget {
   final NoteHeader note;
   final int index;
   final TextEditingController textEditingController;
-
   bool isHideContent;
   CardWidget(
       {required this.note,
@@ -125,7 +124,6 @@ class CardWidget extends StatefulWidget {
 
 class _CardWidgetState extends State<CardWidget> {
   bool startAnimation = false;
-
   @override
   void initState() {
     super.initState();
@@ -140,7 +138,6 @@ class _CardWidgetState extends State<CardWidget> {
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
     return AnimatedContainer(
-      key: widget.key,
       duration: Duration(milliseconds: 300 + (widget.index * 100)),
       transform:
           Matrix4.translationValues(startAnimation ? 0 : screenWidth, 0, 0),
@@ -175,6 +172,7 @@ class _CardWidgetState extends State<CardWidget> {
                       Row(
                         children: [
                           Text(
+                            //Here
                             widget.note.title.toString(),
                             maxLines: 1,
                             style: TextStyle(
@@ -199,7 +197,10 @@ class _CardWidgetState extends State<CardWidget> {
                           widget.isHideContent
                               ? Container()
                               : ContentWidget(
-                                  content: widget.note.noteDetail!.content),
+                                  content: widget.note.noteDetail!.content,
+                                  textEditingController:
+                                      widget.textEditingController,
+                                ),
                         ],
                       ),
                       const SizedBox(
@@ -230,7 +231,9 @@ class _CardWidgetState extends State<CardWidget> {
 
 class ContentWidget extends StatelessWidget {
   final String content;
-  const ContentWidget({super.key, required this.content});
+  final TextEditingController textEditingController;
+  const ContentWidget(
+      {super.key, required this.content, required this.textEditingController});
 
   @override
   Widget build(BuildContext context) {
@@ -240,16 +243,16 @@ class ContentWidget extends StatelessWidget {
           const SizedBox(
             height: 10,
           ),
-          Text(
-            content,
+          SubstringHighlight(
+            text: content, // search result string from database or something
+            term: textEditingController.text, // user typed "et"
             maxLines: 3,
-            textAlign: TextAlign.left,
-            style: TextStyle(
+            textStyle: TextStyle(
                 color: Font_Color_Content,
                 fontSize: Font_Size_CONTENT,
                 fontFamily: Font_Family_LATO,
                 fontWeight: FontWeight.w500),
-          )
+          ),
         ],
       ),
     );

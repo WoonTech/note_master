@@ -524,7 +524,6 @@ class _BodyWidgetState extends State<BodyWidget> {
                                   isHideContent: isHideContent,
                                   index: index,
                                   textEditingController: controller,
-                                  key: UniqueKey(),
                                 );
                               }),
                         ),
