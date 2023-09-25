@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:note_master/widgets/category_widget.dart';
 import 'package:note_master/main.dart';
 import 'package:note_master/models/category.dart';
@@ -123,6 +124,57 @@ class _NotePageState extends State<NotePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         //resizeToAvoidBottomInset: false,
+        floatingActionButton: SpeedDial(
+          animatedIcon: AnimatedIcons.menu_close,
+          animatedIconTheme: IconThemeData(size: 22.0, opacity: 10),
+          visible: true,
+          closeManually: false,
+          curve: Curves.bounceIn,
+          overlayColor: Colors.black,
+          overlayOpacity: 0.4,
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+          elevation: 8.0,
+          shape: const CircleBorder(),
+          children: [
+            SpeedDialChild(
+              child: Icon(Icons.draw),
+              backgroundColor: Colors.white,
+              label: 'Writing',
+              labelStyle: TextStyle(
+                  fontFamily: Font_Family_LATO,
+                  fontSize: Font_Size_DIALOG,
+                  color: Font_Color_Default),
+              onTap: () {
+                // Handle add action here
+              },
+            ),
+            SpeedDialChild(
+              child: Icon(Icons.image),
+              backgroundColor: Colors.white,
+              label: 'Assets',
+              labelStyle: TextStyle(
+                  fontFamily: Font_Family_LATO,
+                  fontSize: Font_Size_DIALOG,
+                  color: Font_Color_Default),
+              onTap: () {
+                // Handle edit action here
+              },
+            ),
+            SpeedDialChild(
+              child: Icon(Icons.text_format),
+              backgroundColor: Colors.white,
+              label: 'Style',
+              labelStyle: TextStyle(
+                  fontFamily: Font_Family_LATO,
+                  fontSize: Font_Size_DIALOG,
+                  color: Font_Color_Default),
+              onTap: () {
+                // Handle delete action here
+              },
+            ),
+          ],
+        ),
         appBar: AppBar(
           backgroundColor: Notepad_Color,
           shadowColor: Colors.transparent,
