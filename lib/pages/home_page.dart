@@ -58,78 +58,29 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               Positioned(
-                  top: 15,
-                  left: 10,
-                  right: 10,
-                  child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      height: 50,
-                      child: Row(
-                        children: [
-                          TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  selectedPage = notesPage;
-                                });
-                              },
-                              style: ButtonStyle(
-                                overlayColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                  (Set<MaterialState> states) {
-                                    return Colors
-                                        .transparent; // Remove overlay color
-                                  },
-                                ),
-                              ),
-                              child: Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: Text('Notes',
-                                      style: TextStyle(
-                                        fontSize: selectedPage == notesPage
-                                            ? Font_Size_AppBar_Selected
-                                            : Font_Size_AppBar_Unselected,
-                                        fontFamily: Font_Family_LATO,
-                                        fontWeight: selectedPage == notesPage
-                                            ? FontWeight.w600
-                                            : FontWeight.w400,
-                                        color: selectedPage == notesPage
-                                            ? Font_Color_Default
-                                            : Font_Color_UNSELECTED,
-                                      )))),
-                          TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  selectedPage = checklistPage;
-                                });
-                              },
-                              style: ButtonStyle(
-                                overlayColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                  (Set<MaterialState> states) {
-                                    return Colors
-                                        .transparent; // Remove overlay color
-                                  },
-                                ),
-                              ),
-                              child: Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: Text('Checklists',
-                                      textAlign: TextAlign.end,
-                                      style: TextStyle(
-                                        fontSize: selectedPage == checklistPage
-                                            ? Font_Size_AppBar_Selected
-                                            : Font_Size_AppBar_Unselected,
-                                        fontFamily: Font_Family_LATO,
-                                        fontWeight:
-                                            selectedPage == checklistPage
-                                                ? FontWeight.w600
-                                                : FontWeight.w400,
-                                        color: selectedPage == checklistPage
-                                            ? Font_Color_Default
-                                            : Font_Color_UNSELECTED,
-                                      ))))
-                        ],
-                      ))),
+                top: 20,
+                left: 10,
+                right: 10,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Note Master',
+                        style: TextStyle(
+                          fontSize: Font_Size_AppBar_Selected,
+                          fontFamily: Font_Family_LATO,
+                          fontWeight: FontWeight.w600,
+                          color: Font_Color_Default,
+                        )),
+                    IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.calendar_month,
+                          color: Colors.black,
+                          size: 23,
+                        ))
+                  ],
+                ),
+              ),
               Positioned(
                   top: 70,
                   right: 15,
