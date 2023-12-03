@@ -8,7 +8,7 @@ import 'package:note_master/models/noteheader.dart';
 import 'package:intl/intl.dart';
 import '../models/layout.dart';
 import '../models/styling.dart';
-import '../pages/notepage.dart';
+import '../pages/notepage/notepage.dart';
 import 'substring_highlighted_widget.dart';
 import 'notecard_detail_widget.dart';
 

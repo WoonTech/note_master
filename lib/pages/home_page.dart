@@ -13,7 +13,7 @@ import '../models/category.dart';
 import '../models/layout.dart';
 import '../models/noteheader.dart';
 import '../services/data_access.dart';
-import 'notepage.dart';
+import 'notepage/notepage.dart';
 
 late String selectedPage;
 late bool isHideContent;
@@ -23,6 +23,7 @@ TextEditingController controller = TextEditingController();
 ItemScrollController categoryBarController = ItemScrollController();
 int selectedIndex = 0;
 List<String> dropdownList = ['Notes', 'reminder: 10 days', 'reminder: 20 days'];
+double contentHeight = Expansion_Height_UNTAP;
 
 class HomePage extends StatefulWidget {
   @override
@@ -77,7 +78,11 @@ class _HomePageState extends State<HomePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => Calendar_Page()),
+                                builder: (context) => Calendar_Page(
+                                      layoutData: layoutData,
+                                      contentHeight: contentHeight,
+                                      controller: controller,
+                                    )),
                           );
                         },
                         icon: const Icon(
@@ -237,9 +242,6 @@ class BodyWidget extends StatefulWidget {
 }
 
 class _BodyWidgetState extends State<BodyWidget> {
-  double _contentHeight = Expansion_Height_UNTAP;
-  //List<NoteHeader> note = [];
-
   @override
   void initState() {
     super.initState();
@@ -478,7 +480,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                                 return NoteCardHolderWidget(
                                   note: correspondingNotes.elementAt(index),
                                   currentTheme: widget.layoutData,
-                                  contentHeight: _contentHeight,
+                                  contentHeight: contentHeight,
                                   isHideContent: isHideContent,
                                   index: index,
                                   textEditingController: controller,

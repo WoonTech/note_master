@@ -10,12 +10,12 @@ import 'package:note_master/models/notereminder.dart';
 import 'package:note_master/models/styling.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../services/data_access.dart';
-import '../widgets/reminder.dart';
-import '../constants/status.dart';
+import '../../services/data_access.dart';
+import '../../widgets/reminder.dart';
+import '../../constants/status.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import '../models/repetition.dart';
+import '../../models/repetition.dart';
 
 class NotePage extends StatefulWidget {
   NoteHeader? cardNote;
@@ -308,25 +308,72 @@ class _NotePageState extends State<NotePage> {
                       const SizedBox(
                         height: 40,
                       ),
-                      TextField(
-                        controller: titleTextEditingController,
-                        decoration: InputDecoration.collapsed(
-                          hintText: 'Title',
-                          hintStyle: TextStyle(
-                              color: Font_Color_DETAILS,
-                              fontSize: Font_Size_TITLE,
-                              fontFamily: Font_Family_LATO,
-                              fontWeight: FontWeight.bold),
-                          border: InputBorder.none,
-                        ),
-                        style: TextStyle(
-                            fontFamily: Font_Family_LATO,
-                            fontSize: Font_Size_TITLE,
-                            fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.left,
-                        onChanged: (value) {
-                          setState(() {});
-                        },
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: titleTextEditingController,
+                              decoration: InputDecoration.collapsed(
+                                hintText: 'Title',
+                                hintStyle: TextStyle(
+                                    color: Font_Color_DETAILS,
+                                    fontSize: Font_Size_TITLE,
+                                    fontFamily: Font_Family_LATO,
+                                    fontWeight: FontWeight.bold),
+                                border: InputBorder.none,
+                              ),
+                              style: TextStyle(
+                                  fontFamily: Font_Family_LATO,
+                                  fontSize: Font_Size_TITLE,
+                                  fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.left,
+                              onChanged: (value) {
+                                setState(() {});
+                              },
+                            ),
+                          ),
+                          /*itemBuilder: (context) => noteCategories
+                      .where((element) => element.type == note_type)
+                      .map((category) {
+                    return PopupMenuItem(
+                        value: category.id,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.circle,
+                              color: category.name == category_default_selection
+                                  ? Colors.transparent
+                                  : subDomainColors[category.colorId],
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text(category.name)
+                          ],
+                        ));
+                  }).toList(),*/
+
+                          DropdownButton(
+                            items: noteCategories
+                                .where((element) => element.type == note_type)
+                                .map<DropdownMenuItem<NoteCategory>>(
+                                    (NoteCategory value) {
+                              return DropdownMenuItem<NoteCategory>(
+                                value: value,
+                                child: Text(
+                                  value.name,
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (NoteCategory? value) {
+                              setState(() {
+                                //_chosenValue = value;
+                              });
+                            },
+                          )
+                        ],
                       ),
                       const SizedBox(
                         height: 15,

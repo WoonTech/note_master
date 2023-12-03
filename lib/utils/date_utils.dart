@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 
 extension StringClean on String {
@@ -21,5 +23,13 @@ extension StringExtension on String {
       reminder = '${duration.inSeconds} seconds';
     }
     return reminder;
+  }
+}
+
+extension DateTimeExtension on DateTime {
+  bool compareDate(DateTime otherDate) {
+    return year == otherDate.year &&
+        month == otherDate.month &&
+        day == otherDate.day;
   }
 }

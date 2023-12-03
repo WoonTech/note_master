@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:note_master/models/repetition.dart';
 import 'package:note_master/pages/checklist_page.dart';
 import 'package:note_master/pages/home_page.dart';
-import 'package:note_master/pages/notepage.dart';
+import 'package:note_master/pages/notepage/notepage.dart';
 import 'package:note_master/services/data_access.dart';
 import 'package:provider/provider.dart';
 import 'constants/status.dart';
