@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:note_master/pages/calendar_page/calendar_page.dart';
 import 'package:note_master/widgets/category_widget.dart';
 import 'package:note_master/constants/status.dart';
 import 'package:note_master/widgets/notecard_detail_widget.dart';
@@ -72,7 +73,13 @@ class _HomePageState extends State<HomePage> {
                           color: Font_Color_Default,
                         )),
                     IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Calendar_Page()),
+                          );
+                        },
                         icon: const Icon(
                           Icons.calendar_month,
                           color: Colors.black,
